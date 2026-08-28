@@ -254,7 +254,7 @@ function PackagePreview({ copied, item, pinned, onCopy }: PackagePreviewProps) {
           </p>
         </section>
       )}
-      <a className="open-package" href={packagePath(item)}>
+      <a className="open-package" href={packagePath(item)} data-astro-prefetch="hover">
         Open full page <ExternalLink size={15} aria-hidden="true" />
       </a>
     </div>

@@ -6,6 +6,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   site: process.env.SITE_URL,
   integrations: [react(), sitemap({ entryLimit: 5000 })],
+  prefetch: true,
   vite: {
     plugins: [tailwindcss()],
   },
