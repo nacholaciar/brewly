@@ -3,6 +3,23 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.3.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.2.1...brewly-v0.3.0) (2026-08-28)
+
+
+### Features
+
+* pin package details in search ([991edc0](https://github.com/nacholaciar/brewly/commit/991edc0edc91f386e81ccacab1dd40d9395e57f8))
+
+
+### Bug Fixes
+
+* simplify mobile package navigation ([34d98c7](https://github.com/nacholaciar/brewly/commit/34d98c7b514be24477fc1abbd68793d7b382b2a3))
+
+
+### Performance Improvements
+
+* speed up client-side routing ([7daf396](https://github.com/nacholaciar/brewly/commit/7daf3964053d18e765ab3e398ca428c992178a63))
+
 ## [0.2.1](https://github.com/nacholaciar/brewly/compare/brewly-v0.2.0...brewly-v0.2.1) (2026-08-28)
 
 
