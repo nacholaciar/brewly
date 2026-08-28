@@ -1222,14 +1222,6 @@ kbd {
     box-shadow: none;
   }
 
-  .command-surface.has-package-detail {
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    box-shadow: var(--shadow-command);
-  }
-
   .search-column {
     border: 0;
   }
@@ -1339,12 +1331,7 @@ kbd {
   }
 
   .detail-panel {
-    margin-top: 0;
-    padding: 26px 20px 24px;
-    background: var(--surface-deep);
-    border: 0;
-    border-top: 1px solid var(--border);
-    border-radius: 0;
+    display: none;
   }
 
   .package-detail-view {
