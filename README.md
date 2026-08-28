@@ -9,6 +9,7 @@ Brewly is a fast, keyboard-first explorer for [Homebrew](https://brew.sh/) formu
 - Search while you type without downloading the entire Homebrew catalogue.
 - Navigate with the keyboard: `⌘ K` / `Ctrl K`, arrow keys, `Enter`, and `Escape`.
 - Inspect the install command, dependencies, licence, homepage, and analytics in place.
+- Discover formulae and casks newly published to the official Homebrew repositories.
 - Give every formula and cask its own static, crawlable URL.
 - Ship HTML and CSS by default, with React limited to the search experience.
 
@@ -39,7 +40,7 @@ SITE_URL=http://localhost:4321 bun run build
 bun run preview
 ```
 
-The generated catalogue is stored in `.cache/` and is intentionally not committed.
+The generated catalogue and 14-day new-package feed are stored in `.cache/` and are intentionally not committed. `GITHUB_TOKEN` is optional but recommended for automated builds to increase the GitHub API rate limit.
 
 ## Production build
 
@@ -51,7 +52,7 @@ bun run data:sync
 bun run build
 ```
 
-The output is written to `dist/`. The search catalogue is emitted as a cacheable static asset and loaded only when the search experience needs it.
+The output is written to `dist/`. The search catalogue is emitted as a cacheable static asset and loaded only when the search experience needs it. Run `bun run data:sync` before each scheduled deployment to refresh `/news`.
 
 ## Cloudflare
 

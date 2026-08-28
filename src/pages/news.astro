@@ -1,0 +1,18 @@
+---
+import NewsFeed from "../components/NewsFeed";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { loadNews } from "../lib/homebrew-data";
+
+const news = loadNews();
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title="New Homebrew Formulae and Casks | Brewly"
+  description="Discover formulae and casks newly published to the official Homebrew repositories."
+  canonicalPath="/news"
+>
+  <section class="news-page" aria-label="New Homebrew packages">
+    <NewsFeed items={news} today={today} client:load />
+  </section>
+</BaseLayout>
