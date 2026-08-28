@@ -153,20 +153,22 @@ a {
 .wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-size: 18px;
   font-weight: 730;
   letter-spacing: -0.02em;
 }
 
-.wordmark svg {
-  width: 23px;
-  color: var(--accent);
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.45;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.wordmark img {
+  width: 32px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 18%));
+  transition: transform 160ms ease;
+}
+
+.wordmark:hover img {
+  transform: translateY(-1px) rotate(-2deg);
 }
 
 .site-header nav {
