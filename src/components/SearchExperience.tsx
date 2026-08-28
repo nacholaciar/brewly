@@ -181,6 +181,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
   const [isSearching, setIsSearching] = useState(false);
   const [openedPackage, setOpenedPackage] = useState<BrewPackage | null>(initialPackage ?? null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchColumnRef = useRef<HTMLDivElement>(null);
 
   const selected = results[Math.min(activeIndex, results.length - 1)] ?? null;
 
@@ -209,7 +210,21 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
 
   useEffect(() => {
     if (openedPackage || !selected) return;
-    document.getElementById(`result-${selected.type}-${selected.slug}`)?.scrollIntoView({ block: "nearest" });
+
+    const container = searchColumnRef.current;
+    const row = document.getElementById(`result-${selected.type}-${selected.slug}`);
+    if (!container || !row) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+    const stickyHeader = container.querySelector<HTMLElement>(".results-header");
+    const visibleTop = containerRect.top + (stickyHeader?.offsetHeight ?? 0);
+
+    if (rowRect.top < visibleTop) {
+      container.scrollTop += rowRect.top - visibleTop;
+    } else if (rowRect.bottom > containerRect.bottom) {
+      container.scrollTop += rowRect.bottom - containerRect.bottom;
+    }
   }, [openedPackage, selected]);
 
   useEffect(() => {
@@ -338,7 +353,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
             />
           ) : (
             <>
-              <div className="search-column">
+              <div ref={searchColumnRef} className="search-column">
                 <div className="results-header">
                   <span>Search results</span>
                   <span>
