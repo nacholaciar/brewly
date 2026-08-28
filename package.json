@@ -22,7 +22,7 @@
     "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.2.9",
-    "lucide-react": "^0.542.0",
+    "lucide-react": "^1.34.0",
     "motion": "13.1.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
