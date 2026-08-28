@@ -4,10 +4,13 @@ import { packages } from "../data/packages";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout>
+<BaseLayout appShell>
   <section class="hero">
     <div class="hero-copy">
-      <h1>Find any <span>Homebrew</span> package.</h1>
+      <div>
+        <span class="section-label">Package explorer</span>
+        <h1>Find any <span>Homebrew</span> package.</h1>
+      </div>
       <p>Formulae and casks, instantly.</p>
     </div>
     <SearchExperience initialPackages={packages} client:load />

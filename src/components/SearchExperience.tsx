@@ -47,7 +47,7 @@ function localSearch(packages: BrewPackage[], query: string) {
     .map((item) => ({ item, score: scorePackage(item, query) }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score || (b.item.installs30d ?? 0) - (a.item.installs30d ?? 0))
-    .slice(0, 5)
+    .slice(0, 8)
     .map(({ item }) => item);
 }
 
@@ -106,14 +106,14 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
           <div className="install-command">
             <code>{installCommand(item)}</code>
             <button type="button" onClick={() => onCopy(item)} aria-label="Copy install command">
-              <AnimatePresence initial={false} mode="wait">
+              <AnimatePresence initial={false}>
                 <m.span
                   className="copy-icon"
                   key={copied ? "copied" : "copy"}
                   initial={{ opacity: 0, scale: 0.7 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.7 }}
-                  transition={{ type: "spring", stiffness: 600, damping: 28 }}
+                  transition={{ duration: 0.08, ease: "easeOut" }}
                 >
                   {copied ? <Check size={19} /> : <Copy size={19} />}
                 </m.span>
@@ -122,54 +122,56 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
           </div>
         </section>
 
-        <section>
-          <h2>Details</h2>
-          <dl className="metadata package-detail-metadata">
-            <div>
-              <dt>Homepage</dt>
-              <dd><a href={item.homepage}>{new URL(item.homepage).hostname}</a></dd>
-            </div>
-            <div>
-              <dt>Type</dt>
-              <dd>{item.type === "formula" ? "Formula" : "Cask"}</dd>
-            </div>
-            {item.license && (
-              <div>
-                <dt>License</dt>
-                <dd>{item.license}</dd>
-              </div>
-            )}
-          </dl>
-        </section>
-
-        {item.dependencies.length > 0 && (
+        <div className="package-detail-sections">
           <section>
-            <h2>Dependencies</h2>
-            <ul className="dependencies">
-              {item.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
-            </ul>
-          </section>
-        )}
-
-        {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
-          <section>
-            <h2>Package data</h2>
+            <h2>Details</h2>
             <dl className="metadata package-detail-metadata">
-              {item.installs30d && (
+              <div>
+                <dt>Homepage</dt>
+                <dd><a href={item.homepage}>{new URL(item.homepage).hostname}</a></dd>
+              </div>
+              <div>
+                <dt>Type</dt>
+                <dd>{item.type === "formula" ? "Formula" : "Cask"}</dd>
+              </div>
+              {item.license && (
                 <div>
-                  <dt>30-day installs</dt>
-                  <dd>{item.installs30d.toLocaleString("en-US")}</dd>
-                </div>
-              )}
-              {(item.aliases?.length ?? 0) > 0 && (
-                <div>
-                  <dt>Aliases</dt>
-                  <dd>{item.aliases?.join(", ")}</dd>
+                  <dt>License</dt>
+                  <dd>{item.license}</dd>
                 </div>
               )}
             </dl>
           </section>
-        )}
+
+          {item.dependencies.length > 0 && (
+            <section>
+              <h2>Dependencies</h2>
+              <ul className="dependencies">
+                {item.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
+              </ul>
+            </section>
+          )}
+
+          {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
+            <section>
+              <h2>Package data</h2>
+              <dl className="metadata package-detail-metadata">
+                {item.installs30d && (
+                  <div>
+                    <dt>30-day installs</dt>
+                    <dd>{item.installs30d.toLocaleString("en-US")}</dd>
+                  </div>
+                )}
+                {(item.aliases?.length ?? 0) > 0 && (
+                  <div>
+                    <dt>Aliases</dt>
+                    <dd>{item.aliases?.join(", ")}</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -191,7 +193,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       if (!query.trim()) {
-        setResults(initialPackages.slice(0, 5));
+        setResults(initialPackages.slice(0, 8));
         setIsSearching(false);
         return;
       }
@@ -293,7 +295,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
   async function copyInstallCommand(item: BrewPackage) {
     await navigator.clipboard.writeText(installCommand(item));
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 1600);
+    window.setTimeout(() => setCopied(false), 650);
   }
 
   return (
@@ -336,6 +338,10 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
           ) : (
             <>
           <div className="search-column">
+            <div className="results-header">
+              <span>Search results</span>
+              <span>{results.length} {results.length === 1 ? "package" : "packages"}</span>
+            </div>
             <div id="search-results" className="results" role="listbox" aria-label="Search results">
               {results.map((item, index) => {
                 const isActive = index === activeIndex;
@@ -403,14 +409,14 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
                     <div className="install-command">
                       <code>{installCommand(selected)}</code>
                       <button type="button" onClick={() => copyInstallCommand(selected)} aria-label="Copy install command">
-                        <AnimatePresence initial={false} mode="wait">
+                        <AnimatePresence initial={false}>
                           <m.span
                             className="copy-icon"
                             key={copied ? "copied" : "copy"}
                             initial={{ opacity: 0, scale: 0.7 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.7 }}
-                            transition={{ type: "spring", stiffness: 600, damping: 28 }}
+                            transition={{ duration: 0.08, ease: "easeOut" }}
                           >
                             {copied ? <Check size={19} /> : <Copy size={19} />}
                           </m.span>
