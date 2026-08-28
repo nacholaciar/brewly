@@ -242,6 +242,7 @@ a {
 }
 
 .command-surface {
+  height: 100%;
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(440px, 1.25fr) minmax(360px, 0.75fr);
@@ -358,6 +359,15 @@ kbd {
   background: linear-gradient(90deg, var(--accent-wash), transparent 82%);
   border-bottom-color: var(--border-subtle);
   box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.result-row.is-pinned:not(.is-active) {
+  background: linear-gradient(90deg, var(--accent-wash), transparent 58%);
+  box-shadow: inset 2px 0 0 var(--accent-soft);
+}
+
+.result-row.is-pinned .result-icon {
+  color: var(--accent);
 }
 
 .result-icon {
@@ -602,6 +612,16 @@ kbd {
   font-size: 23px;
   line-height: 1.2;
   letter-spacing: -0.025em;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detail-title-row .type-label {
+  flex: 0 0 auto;
 }
 
 .detail-header code {
