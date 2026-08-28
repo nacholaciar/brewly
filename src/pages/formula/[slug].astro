@@ -16,6 +16,7 @@ const initialPackages = [item, ...seedPackages.filter((candidate) => candidate.s
 ---
 
 <BaseLayout
+  appShell
   title={`${item.name} — Homebrew Formula | Brewly`}
   description={`${item.description}. Install ${item.name} with Homebrew.`}
   canonicalPath={packagePath(item)}
@@ -30,6 +31,13 @@ const initialPackages = [item, ...seedPackages.filter((candidate) => candidate.s
   }}
 >
   <section class="hero package-explorer">
+    <div class="hero-copy">
+      <div>
+        <span class="section-label">Package explorer</span>
+        <h1>Find any <span>Homebrew</span> package.</h1>
+      </div>
+      <p>Formulae and casks, instantly.</p>
+    </div>
     <SearchExperience initialPackages={initialPackages} initialPackage={item} client:load />
   </section>
 </BaseLayout>

@@ -90,37 +90,16 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
       </div>
 
       <header className="package-detail-hero">
-        <span className="package-detail-icon" aria-hidden="true">
-          <PackageIcon size={38} strokeWidth={1.45} />
-        </span>
-        <div>
-          <Heading>{item.name}</Heading>
-          <code>{item.version}</code>
-          <p>{item.description}</p>
-        </div>
-      </header>
-
-      <div className="package-detail-grid">
-        <section className="package-detail-install">
-          <h2>Install</h2>
-          <div className="install-command">
-            <code>{installCommand(item)}</code>
-            <button type="button" onClick={() => onCopy(item)} aria-label="Copy install command">
-              <AnimatePresence initial={false}>
-                <m.span
-                  className="copy-icon"
-                  key={copied ? "copied" : "copy"}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.08, ease: "easeOut" }}
-                >
-                  {copied ? <Check size={19} /> : <Copy size={19} />}
-                </m.span>
-              </AnimatePresence>
-            </button>
+        <div className="package-detail-identity">
+          <span className="package-detail-icon" aria-hidden="true">
+            <PackageIcon size={38} strokeWidth={1.45} />
+          </span>
+          <div>
+            <Heading>{item.name}</Heading>
+            <code>{item.version}</code>
+            <p>{item.description}</p>
           </div>
-        </section>
+        </div>
 
         <div className="package-detail-sections">
           <section>
@@ -172,6 +151,29 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             </section>
           )}
         </div>
+      </header>
+
+      <div className="package-detail-grid">
+        <section className="package-detail-install">
+          <h2>Install</h2>
+          <div className="install-command">
+            <code>{installCommand(item)}</code>
+            <button type="button" onClick={() => onCopy(item)} aria-label="Copy install command">
+              <AnimatePresence initial={false}>
+                <m.span
+                  className="copy-icon"
+                  key={copied ? "copied" : "copy"}
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 0.08, ease: "easeOut" }}
+                >
+                  {copied ? <Check size={19} /> : <Copy size={19} />}
+                </m.span>
+              </AnimatePresence>
+            </button>
+          </div>
+        </section>
       </div>
     </article>
   );

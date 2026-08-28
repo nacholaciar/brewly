@@ -424,10 +424,18 @@ kbd {
 
 .package-detail-hero {
   padding: 18px 0 22px;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(380px, 0.95fr);
+  align-items: stretch;
+  gap: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.package-detail-identity {
+  min-width: 0;
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  border-bottom: 1px solid var(--border);
 }
 
 .package-detail-icon {
@@ -470,31 +478,33 @@ kbd {
 }
 
 .package-detail-grid > .package-detail-install {
+  width: min(680px, 100%);
   min-width: 0;
-  padding: 21px 0;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 30px 0 24px;
+  margin: 0 auto;
 }
 
 .package-detail-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  border-bottom: 1px solid var(--border-subtle);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  border-left: 1px solid var(--border-subtle);
 }
 
 .package-detail-sections > section {
   min-width: 0;
-  padding: 22px 24px;
+  padding: 2px 24px;
 }
 
 .package-detail-sections > section:first-child {
-  padding-left: 0;
+  padding-left: 24px;
 }
 
 .package-detail-sections > section + section {
   border-left: 1px solid var(--border-subtle);
 }
 
-.package-detail-grid h2 {
+.package-detail-install h2,
+.package-detail-sections h2 {
   margin: 0 0 14px;
   color: var(--text-muted);
   font-size: 12px;
@@ -504,7 +514,7 @@ kbd {
 }
 
 .package-detail-install .install-command {
-  max-width: 680px;
+  width: 100%;
 }
 
 .package-detail-metadata > div {
@@ -815,13 +825,20 @@ kbd {
     display: block;
   }
 
-  .package-detail-sections {
+  .package-detail-hero {
     grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .package-detail-sections {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    border-top: 1px solid var(--border-subtle);
+    border-left: 0;
   }
 
   .package-detail-sections > section,
   .package-detail-sections > section:first-child {
-    padding: 21px 0;
+    padding: 20px 20px 0 0;
   }
 
   .package-detail-sections > section + section {
@@ -975,6 +992,8 @@ kbd {
 
   .package-detail-view {
     padding: 18px 18px 22px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -989,11 +1008,37 @@ kbd {
 
   .package-detail-toolbar {
     min-height: 28px;
+    order: 0;
   }
 
   .package-detail-hero {
+    display: contents;
+  }
+
+  .package-detail-identity {
+    order: 1;
     padding: 18px 0 21px;
     gap: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .package-detail-grid {
+    order: 2;
+  }
+
+  .package-detail-grid > .package-detail-install {
+    width: 100%;
+    padding: 21px 0;
+  }
+
+  .package-detail-sections {
+    order: 3;
+    grid-template-columns: 1fr;
+  }
+
+  .package-detail-sections > section,
+  .package-detail-sections > section:first-child {
+    padding: 21px 0;
   }
 
   .package-detail-icon {
