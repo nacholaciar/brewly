@@ -30,14 +30,7 @@ const initialPackages = [item, ...seedPackages.filter((candidate) => candidate.s
     applicationCategory: "DeveloperApplication",
   }}
 >
-  <section class="hero package-explorer">
-    <div class="hero-copy">
-      <div>
-        <span class="section-label">Package explorer</span>
-        <h1>Find any <span>Homebrew</span> package.</h1>
-      </div>
-      <p>Formulae and casks, instantly.</p>
-    </div>
+  <section class="hero">
     <SearchExperience initialPackages={initialPackages} initialPackage={item} client:load />
   </section>
 </BaseLayout>

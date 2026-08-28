@@ -1,6 +1,4 @@
-import ArrowDown from "lucide-react/dist/esm/icons/arrow-down";
 import ArrowLeft from "lucide-react/dist/esm/icons/arrow-left";
-import ArrowUp from "lucide-react/dist/esm/icons/arrow-up";
 import Check from "lucide-react/dist/esm/icons/check";
 import Copy from "lucide-react/dist/esm/icons/copy";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
@@ -179,9 +177,11 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
 }
 
 export default function SearchExperience({ initialPackages, initialPackage }: Props) {
-  const initialQuery = initialPackage?.slug ?? "post";
+  const initialQuery = initialPackage?.slug ?? "";
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState(() => localSearch(initialPackages, initialQuery));
+  const [results, setResults] = useState(() =>
+    initialQuery ? localSearch(initialPackages, initialQuery) : initialPackages.slice(0, 8),
+  );
   const [activeIndex, setActiveIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -448,20 +448,6 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
             </>
           )}
 
-          <div className="key-rail" aria-hidden="true">
-            {openedPackage ? (
-              <>
-                <span><kbd>Esc</kbd> Results</span>
-                <span>Type to search again</span>
-              </>
-            ) : (
-              <>
-                <span><kbd><ArrowUp size={13} /><ArrowDown size={13} /></kbd> Navigate</span>
-                <span><kbd>↵</kbd> Open</span>
-                <span><kbd>Esc</kbd> Clear</span>
-              </>
-            )}
-          </div>
         </m.section>
       </MotionConfig>
     </LazyMotion>
