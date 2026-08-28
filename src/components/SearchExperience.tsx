@@ -306,9 +306,8 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
         <m.section
           className={`command-surface ${openedPackage ? "has-package-detail" : ""}`}
           aria-label="Package search"
-          initial={{ opacity: 0, y: 10 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         >
           <label className="search-box" htmlFor="package-search">
               <Search aria-hidden="true" size={24} strokeWidth={1.8} />

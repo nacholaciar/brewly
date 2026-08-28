@@ -27,7 +27,19 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#0b0c0d" />
+    <script is:inline>
+      (() => {
+        try {
+          const savedTheme = localStorage.getItem("brewly-theme");
+          const theme = savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch {}
+      })();
+    </script>
+    <meta id="theme-color" name="theme-color" content="#0b0c0d" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -47,10 +59,21 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         </svg>
         <span>Brewly</span>
       </a>
-      <nav aria-label="Primary navigation">
-        <a href={repositoryUrl} rel="noreferrer">GitHub</a>
-        <a href="/about">About</a>
-      </nav>
+      <div class="header-actions">
+        <nav aria-label="Primary navigation">
+          <a href={repositoryUrl} rel="noreferrer">GitHub</a>
+          <a href="/about">About</a>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="sun-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg class="moon-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"></path>
+          </svg>
+        </button>
+      </div>
     </header>
     <main id="main">
       <slot />
@@ -60,5 +83,29 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         <p>Brewly is an independent project and is not affiliated with Homebrew.</p>
       </footer>
     )}
+    <script is:inline>
+      (() => {
+        const button = document.querySelector(".theme-toggle");
+        const themeColor = document.querySelector("#theme-color");
+        if (!(button instanceof HTMLButtonElement)) return;
+
+        const updateButton = (theme) => {
+          const nextTheme = theme === "dark" ? "light" : "dark";
+          button.setAttribute("aria-label", `Switch to ${nextTheme} theme`);
+          if (themeColor instanceof HTMLMetaElement) {
+            themeColor.content = theme === "dark" ? "#0b0c0d" : "#f6f5f2";
+          }
+        };
+
+        updateButton(document.documentElement.dataset.theme ?? "dark");
+        button.addEventListener("click", () => {
+          const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+          localStorage.setItem("brewly-theme", theme);
+          updateButton(theme);
+        });
+      })();
+    </script>
   </body>
 </html>
