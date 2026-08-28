@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.4.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.3.0...brewly-v0.4.0) (2026-08-28)
+
+
+### Features
+
+* **ui:** refine package detail layout ([4496ca1](https://github.com/nacholaciar/brewly/commit/4496ca1d095cb3a1648a6a7ed470a552aecceeb3))
+
 ## [0.3.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.2.1...brewly-v0.3.0) (2026-08-28)
 
 
