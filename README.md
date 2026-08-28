@@ -68,6 +68,17 @@ bun run deploy:dry-run
 
 Brewly is in its initial public-development stage. The core search and package-page architecture is working; see the issue tracker for planned improvements.
 
+## Releases
+
+Releases are managed by [Release Please](https://github.com/googleapis/release-please) from commits made on `main`:
+
+- `fix: ...` proposes a patch release.
+- `feat: ...` proposes a minor release.
+- `feat!: ...` or a `BREAKING CHANGE:` footer proposes a breaking release.
+- `docs:`, `chore:`, `refactor:` and `test:` do not trigger a release by default.
+
+After changes reach `main`, Release Please creates or updates a release pull request containing the version bump and `CHANGELOG.md`. Merging that pull request creates the Git tag and GitHub Release.
+
 ## Contributing
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md) before opening a pull request.

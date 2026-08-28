@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "07ac608a59e4a05e05fb49166baebe96af436aac",
+  "release-type": "node",
+  "bump-minor-pre-major": true,
+  "include-v-in-tag": true,
+  "packages": {
+    ".": {
+      "package-name": "brewly"
+    }
+  }
+}
