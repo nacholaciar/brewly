@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.2.1](https://github.com/nacholaciar/brewly/compare/brewly-v0.2.0...brewly-v0.2.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* constrain keyboard navigation scroll ([f51d00b](https://github.com/nacholaciar/brewly/commit/f51d00b287b99e7aef94ca88a9b9514eb310ddf2))
+
 ## [0.2.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.1.0...brewly-v0.2.0) (2026-08-28)
 
 
