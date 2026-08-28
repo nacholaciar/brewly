@@ -75,9 +75,7 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--text);
-  background:
-    radial-gradient(circle at 50% 38%, var(--body-glow), transparent 35%),
-    var(--background);
+  background: radial-gradient(circle at 50% 38%, var(--body-glow), transparent 35%), var(--background);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
@@ -195,7 +193,10 @@ a {
   border: 1px solid var(--border);
   border-radius: 9px;
   cursor: pointer;
-  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
 }
 
 .theme-toggle:hover {
@@ -343,7 +344,10 @@ kbd {
   border-bottom-color: var(--border-subtle);
   overflow: hidden;
   cursor: pointer;
-  transition: color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .result-row:last-child {
@@ -674,7 +678,9 @@ kbd {
   border: 0;
   border-left: 1px solid var(--border);
   cursor: pointer;
-  transition: color 140ms ease, background 140ms ease;
+  transition:
+    color 140ms ease,
+    background 140ms ease;
 }
 
 .copy-icon {
@@ -790,6 +796,8 @@ kbd {
 }
 
 .news-filters {
+  min-inline-size: 0;
+  margin: 0;
   padding: 4px;
   display: inline-flex;
   gap: 3px;
@@ -806,7 +814,10 @@ kbd {
   border-radius: 7px;
   font-size: 13px;
   cursor: pointer;
-  transition: color 130ms ease, background-color 130ms ease, box-shadow 130ms ease;
+  transition:
+    color 130ms ease,
+    background-color 130ms ease,
+    box-shadow 130ms ease;
 }
 
 .news-filters button:hover {
@@ -993,7 +1004,9 @@ kbd {
   border: 0;
   border-left: 1px solid var(--border);
   cursor: pointer;
-  transition: color 130ms ease, background-color 130ms ease;
+  transition:
+    color 130ms ease,
+    background-color 130ms ease;
 }
 
 .news-card-actions button:hover,
@@ -1151,7 +1164,6 @@ kbd {
     border-top: 1px solid var(--border-subtle);
     border-left: 0;
   }
-
 }
 
 @media (max-width: 600px) {

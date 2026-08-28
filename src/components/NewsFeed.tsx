@@ -73,7 +73,8 @@ export default function NewsFeed({ items, today }: Props) {
       </header>
 
       <div className="news-toolbar">
-        <div className="news-filters" aria-label="Filter new packages">
+        <fieldset className="news-filters">
+          <legend className="sr-only">Filter new packages</legend>
           {filters.map((option) => (
             <button
               type="button"
@@ -85,7 +86,7 @@ export default function NewsFeed({ items, today }: Props) {
               {option.label}
             </button>
           ))}
-        </div>
+        </fieldset>
         <span>{visibleItems.length} additions in the last 14 days</span>
       </div>
 
@@ -99,7 +100,9 @@ export default function NewsFeed({ items, today }: Props) {
         <section className="news-day" key={date} aria-labelledby={`news-${date}`}>
           <div className="news-day-heading">
             <h2 id={`news-${date}`}>{dateHeading(date, today)}</h2>
-            <span>{dateItems.length} {dateItems.length === 1 ? "package" : "packages"}</span>
+            <span>
+              {dateItems.length} {dateItems.length === 1 ? "package" : "packages"}
+            </span>
           </div>
           <div className="news-grid">
             {dateItems.map((item) => {

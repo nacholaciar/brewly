@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { packages as samplePackages } from "../data/packages";
 import { news as sampleNews } from "../data/news";
+import { packages as samplePackages } from "../data/packages";
 import type { NewsItem } from "./news";
 import type { BrewPackage } from "./packages";
 

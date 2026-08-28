@@ -2,31 +2,30 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
-import type { BrewPackage } from "../src/lib/packages";
 import type { NewsItem } from "../src/lib/news";
+import type { BrewPackage } from "../src/lib/packages";
 
 const API_BASE = "https://formulae.brew.sh/api";
-const outputPath = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.cache/packages.json",
-);
-const newsOutputPath = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../.cache/news.json",
-);
+const outputPath = resolve(dirname(fileURLToPath(import.meta.url)), "../.cache/packages.json");
+const newsOutputPath = resolve(dirname(fileURLToPath(import.meta.url)), "../.cache/news.json");
 const NEWS_WINDOW_DAYS = 14;
 
 const formulaSchema = z.object({
   name: z.string(),
   desc: z.string().nullable().optional(),
   homepage: z.string(),
-  license: z.union([z.string(), z.record(z.string(), z.unknown())]).nullable().optional(),
+  license: z
+    .union([z.string(), z.record(z.string(), z.unknown())])
+    .nullable()
+    .optional(),
   versions: z.object({ stable: z.string().nullable().optional() }),
   dependencies: z.array(z.string()).optional(),
   aliases: z.array(z.string()).optional(),
-  analytics: z.object({
-    install_on_request: z.record(z.string(), z.record(z.string(), z.number())).optional(),
-  }).optional(),
+  analytics: z
+    .object({
+      install_on_request: z.record(z.string(), z.record(z.string(), z.number())).optional(),
+    })
+    .optional(),
 });
 
 const caskSchema = z.object({
@@ -47,14 +46,16 @@ const caskAnalyticsSchema = z.object({
 });
 
 const githubCommitSearchSchema = z.object({
-  items: z.array(z.object({
-    sha: z.string(),
-    html_url: z.url(),
-    commit: z.object({
-      message: z.string(),
-      committer: z.object({ date: z.string() }),
+  items: z.array(
+    z.object({
+      sha: z.string(),
+      html_url: z.url(),
+      commit: z.object({
+        message: z.string(),
+        committer: z.object({ date: z.string() }),
+      }),
     }),
-  })),
+  ),
 });
 
 async function fetchJson(path: string) {
@@ -66,9 +67,7 @@ async function fetchJson(path: string) {
 }
 
 async function fetchGithubCommits(repository: string, kind: "formula" | "cask") {
-  const since = new Date(Date.now() - (NEWS_WINDOW_DAYS - 1) * 86_400_000)
-    .toISOString()
-    .slice(0, 10);
+  const since = new Date(Date.now() - (NEWS_WINDOW_DAYS - 1) * 86_400_000).toISOString().slice(0, 10);
   const query = `repo:${repository} "new ${kind}" committer-date:>=${since}`;
   const headers: Record<string, string> = {
     accept: "application/vnd.github+json",
@@ -122,29 +121,35 @@ const caskPopularity = new Map(
   caskAnalyticsSchema.parse(rawCaskAnalytics).items.map((item) => [item.cask, numericCount(item.count)]),
 );
 
-const formulae = z.array(formulaSchema).parse(rawFormulae).map<BrewPackage>((item) => ({
-  slug: item.name,
-  name: item.name,
-  type: "formula",
-  version: item.versions.stable ?? "unknown",
-  description: item.desc ?? "Homebrew formula",
-  homepage: item.homepage,
-  license: licenseLabel(item.license),
-  dependencies: item.dependencies ?? [],
-  installs30d: formulaPopularity.get(item.name) ?? formulaInstalls30d(item),
-  aliases: item.aliases,
-}));
+const formulae = z
+  .array(formulaSchema)
+  .parse(rawFormulae)
+  .map<BrewPackage>((item) => ({
+    slug: item.name,
+    name: item.name,
+    type: "formula",
+    version: item.versions.stable ?? "unknown",
+    description: item.desc ?? "Homebrew formula",
+    homepage: item.homepage,
+    license: licenseLabel(item.license),
+    dependencies: item.dependencies ?? [],
+    installs30d: formulaPopularity.get(item.name) ?? formulaInstalls30d(item),
+    aliases: item.aliases,
+  }));
 
-const casks = z.array(caskSchema).parse(rawCasks).map<BrewPackage>((item) => ({
-  slug: item.token,
-  name: item.name?.[0] ?? item.token,
-  type: "cask",
-  version: item.version ?? "unknown",
-  description: item.desc ?? "Homebrew cask",
-  homepage: item.homepage,
-  dependencies: item.depends_on?.formula ?? [],
-  installs30d: caskPopularity.get(item.token),
-}));
+const casks = z
+  .array(caskSchema)
+  .parse(rawCasks)
+  .map<BrewPackage>((item) => ({
+    slug: item.token,
+    name: item.name?.[0] ?? item.token,
+    type: "cask",
+    version: item.version ?? "unknown",
+    description: item.desc ?? "Homebrew cask",
+    homepage: item.homepage,
+    dependencies: item.depends_on?.formula ?? [],
+    installs30d: caskPopularity.get(item.token),
+  }));
 
 const packages = [...formulae, ...casks].sort((a, b) => a.slug.localeCompare(b.slug));
 const packageByKey = new Map(packages.map((item) => [`${item.type}:${item.slug}`, item]));

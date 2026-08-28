@@ -18,7 +18,5 @@ export function packagePath(item: Pick<BrewPackage, "type" | "slug">) {
 }
 
 export function installCommand(item: Pick<BrewPackage, "type" | "slug">) {
-  return item.type === "cask"
-    ? `brew install --cask ${item.slug}`
-    : `brew install ${item.slug}`;
+  return item.type === "cask" ? `brew install --cask ${item.slug}` : `brew install ${item.slug}`;
 }

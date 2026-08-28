@@ -1,9 +1,9 @@
 ---
-import { loadPackages } from "../../lib/homebrew-data";
 import SearchExperience from "../../components/SearchExperience";
 import { packages as seedPackages } from "../../data/packages";
-import { packagePath, type BrewPackage } from "../../lib/packages";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { loadPackages } from "../../lib/homebrew-data";
+import { type BrewPackage, packagePath } from "../../lib/packages";
 
 export function getStaticPaths() {
   return loadPackages()

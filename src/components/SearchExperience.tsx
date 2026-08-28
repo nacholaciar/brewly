@@ -7,11 +7,7 @@ import Search from "lucide-react/dist/esm/icons/search";
 import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
 import * as m from "motion/react-m";
 import { startTransition, useEffect, useRef, useState } from "react";
-import {
-  installCommand,
-  packagePath,
-  type BrewPackage,
-} from "../lib/packages";
+import { type BrewPackage, installCommand, packagePath } from "../lib/packages";
 
 type Props = {
   initialPackages: BrewPackage[];
@@ -54,12 +50,8 @@ function scorePackage(item: BrewPackage, rawQuery: string) {
   if (!query) return 1;
   const name = item.name.toLowerCase();
   const slug = item.slug.toLowerCase();
-  const searchableText = [name, slug, item.description, ...(item.aliases ?? [])]
-    .join(" ")
-    .toLowerCase();
-  const fuzzyTargets = [name, slug, ...(item.aliases ?? [])]
-    .join(" ")
-    .toLowerCase();
+  const searchableText = [name, slug, item.description, ...(item.aliases ?? [])].join(" ").toLowerCase();
+  const fuzzyTargets = [name, slug, ...(item.aliases ?? [])].join(" ").toLowerCase();
   if (name === query || slug === query) return 100;
   if (name.startsWith(query) || slug.startsWith(query)) return 80;
   if (name.includes(query) || slug.includes(query)) return 60;
@@ -82,9 +74,7 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
           <ArrowLeft size={16} aria-hidden="true" />
           Back to results
         </button>
-        <span className={`type-label type-${item.type}`}>
-          {item.type === "formula" ? "Formula" : "Cask"}
-        </span>
+        <span className={`type-label type-${item.type}`}>{item.type === "formula" ? "Formula" : "Cask"}</span>
       </div>
 
       <header className="package-detail-hero">
@@ -105,7 +95,9 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             <dl className="metadata package-detail-metadata">
               <div>
                 <dt>Homepage</dt>
-                <dd><a href={item.homepage}>{new URL(item.homepage).hostname}</a></dd>
+                <dd>
+                  <a href={item.homepage}>{new URL(item.homepage).hostname}</a>
+                </dd>
               </div>
               <div>
                 <dt>Type</dt>
@@ -124,7 +116,9 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             <section>
               <h2>Dependencies</h2>
               <ul className="dependencies">
-                {item.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
+                {item.dependencies.map((dependency) => (
+                  <li key={dependency}>{dependency}</li>
+                ))}
               </ul>
             </section>
           )}
@@ -213,7 +207,10 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
     };
   }, [initialPackages, query]);
 
-  useEffect(() => setActiveIndex(0), [query]);
+  useEffect(() => {
+    if (openedPackage || !selected) return;
+    document.getElementById(`result-${selected.type}-${selected.slug}`)?.scrollIntoView({ block: "nearest" });
+  }, [openedPackage, selected]);
 
   useEffect(() => {
     function openSearch(event: KeyboardEvent) {
@@ -269,6 +266,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
       setOpenedPackage(null);
     }
     setQuery(value);
+    setActiveIndex(0);
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -289,6 +287,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
         return;
       }
       setQuery("");
+      setActiveIndex(0);
       inputRef.current?.blur();
     }
   }
@@ -309,22 +308,24 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
           animate={{ opacity: 1, y: 0 }}
         >
           <label className="search-box" htmlFor="package-search">
-              <Search aria-hidden="true" size={24} strokeWidth={1.8} />
-              <span className="sr-only">Search formulae and casks</span>
-              <input
-                ref={inputRef}
-                id="package-search"
-                type="search"
-                autoComplete="off"
-                autoFocus
-                value={query}
-                onChange={(event) => updateQuery(event.target.value)}
-                onKeyDown={onKeyDown}
-                placeholder="Search formulae and casks…"
-                aria-controls="search-results"
-                aria-activedescendant={!openedPackage && selected ? `result-${selected.type}-${selected.slug}` : undefined}
-              />
-              <kbd>⌘ K</kbd>
+            <Search aria-hidden="true" size={24} strokeWidth={1.8} />
+            <span className="sr-only">Search formulae and casks</span>
+            <input
+              ref={inputRef}
+              id="package-search"
+              type="search"
+              autoComplete="off"
+              autoFocus
+              value={query}
+              onChange={(event) => updateQuery(event.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="Search formulae and casks…"
+              aria-controls="search-results"
+              aria-activedescendant={
+                !openedPackage && selected ? `result-${selected.type}-${selected.slug}` : undefined
+              }
+            />
+            <kbd>⌘ K</kbd>
           </label>
 
           {openedPackage ? (
@@ -337,117 +338,124 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
             />
           ) : (
             <>
-          <div className="search-column">
-            <div className="results-header">
-              <span>Search results</span>
-              <span>{results.length} {results.length === 1 ? "package" : "packages"}</span>
-            </div>
-            <div id="search-results" className="results" role="listbox" aria-label="Search results">
-              {results.map((item, index) => {
-                const isActive = index === activeIndex;
-                return (
-                  <button
-                    type="button"
-                    id={`result-${item.type}-${item.slug}`}
-                    role="option"
-                    aria-selected={isActive}
-                    className={`result-row ${isActive ? "is-active" : ""}`}
-                    key={`${item.type}-${item.slug}`}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => openPackage(item)}
-                  >
-                    <span className="result-icon" aria-hidden="true">
-                      <PackageIcon size={22} strokeWidth={1.7} />
-                    </span>
-                    <span className="result-copy">
-                      <strong>{item.name}</strong>
-                      <span>{item.description}</span>
-                    </span>
-                    <span className={`type-label type-${item.type}`}>
-                      {item.type === "formula" ? "Formula" : "Cask"}
-                    </span>
-                    <code>{item.version}</code>
-                  </button>
-                );
-              })}
-              {results.length === 0 && (
-                <div className="empty-state" role="status">
-                  <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
-                  {!isSearching && <span>Try a name, command, or description.</span>}
+              <div className="search-column">
+                <div className="results-header">
+                  <span>Search results</span>
+                  <span>
+                    {results.length} {results.length === 1 ? "package" : "packages"}
+                  </span>
                 </div>
-              )}
-            </div>
-          </div>
-
-          <aside className="detail-panel" aria-live="polite">
-            {selected ? (
-              <div className="detail-content">
-                  <header className="detail-header">
-                    <span className="detail-icon" aria-hidden="true">
-                      <PackageIcon size={32} strokeWidth={1.55} />
-                    </span>
-                    <div>
-                      <h2>{selected.name}</h2>
-                      <code>{selected.version}</code>
-                    </div>
-                  </header>
-                  <p className="detail-description">{selected.description}</p>
-                  <dl className="metadata">
-                    <div>
-                      <dt>Homepage</dt>
-                      <dd><a href={selected.homepage}>{new URL(selected.homepage).hostname}</a></dd>
-                    </div>
-                    {selected.license && (
-                      <div>
-                        <dt>License</dt>
-                        <dd>{selected.license}</dd>
-                      </div>
-                    )}
-                  </dl>
-                  <section className="detail-section">
-                    <h3>Install</h3>
-                    <div className="install-command">
-                      <code>{installCommand(selected)}</code>
+                <div id="search-results" className="results" role="listbox" aria-label="Search results">
+                  {results.map((item, index) => {
+                    const isActive = index === activeIndex;
+                    return (
                       <button
-                        className={copied ? "is-copied" : undefined}
                         type="button"
-                        onClick={() => copyInstallCommand(selected)}
-                        aria-label={copied ? "Install command copied" : "Copy install command"}
+                        id={`result-${item.type}-${item.slug}`}
+                        role="option"
+                        aria-selected={isActive}
+                        className={`result-row ${isActive ? "is-active" : ""}`}
+                        key={`${item.type}-${item.slug}`}
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onClick={() => openPackage(item)}
                       >
-                        <span className="copy-icon" aria-hidden="true">
-                          {copied ? <Check size={19} /> : <Copy size={19} />}
+                        <span className="result-icon" aria-hidden="true">
+                          <PackageIcon size={22} strokeWidth={1.7} />
                         </span>
-                        <span className="sr-only" aria-live="polite">
-                          {copied ? "Copied to clipboard" : ""}
+                        <span className="result-copy">
+                          <strong>{item.name}</strong>
+                          <span>{item.description}</span>
                         </span>
+                        <span className={`type-label type-${item.type}`}>
+                          {item.type === "formula" ? "Formula" : "Cask"}
+                        </span>
+                        <code>{item.version}</code>
                       </button>
+                    );
+                  })}
+                  {results.length === 0 && (
+                    <div className="empty-state" role="status">
+                      <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
+                      {!isSearching && <span>Try a name, command, or description.</span>}
                     </div>
-                  </section>
-                  {selected.dependencies.length > 0 && (
-                    <section className="detail-section">
-                      <h3>Dependencies</h3>
-                      <ul className="dependencies">
-                        {selected.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
-                      </ul>
-                    </section>
                   )}
-                  {selected.installs30d && (
-                    <section className="detail-section analytics">
-                      <h3>Analytics</h3>
-                      <p>30-day installs: <strong>{selected.installs30d.toLocaleString("en-US")}</strong></p>
-                    </section>
-                  )}
-                  <a className="open-package" href={packagePath(selected)}>
-                    Open package page <ExternalLink size={15} aria-hidden="true" />
-                  </a>
+                </div>
               </div>
-            ) : (
-              <div className="detail-placeholder">Start typing to inspect a package.</div>
-            )}
-          </aside>
+
+              <aside className="detail-panel" aria-live="polite">
+                {selected ? (
+                  <div className="detail-content">
+                    <header className="detail-header">
+                      <span className="detail-icon" aria-hidden="true">
+                        <PackageIcon size={32} strokeWidth={1.55} />
+                      </span>
+                      <div>
+                        <h2>{selected.name}</h2>
+                        <code>{selected.version}</code>
+                      </div>
+                    </header>
+                    <p className="detail-description">{selected.description}</p>
+                    <dl className="metadata">
+                      <div>
+                        <dt>Homepage</dt>
+                        <dd>
+                          <a href={selected.homepage}>{new URL(selected.homepage).hostname}</a>
+                        </dd>
+                      </div>
+                      {selected.license && (
+                        <div>
+                          <dt>License</dt>
+                          <dd>{selected.license}</dd>
+                        </div>
+                      )}
+                    </dl>
+                    <section className="detail-section">
+                      <h3>Install</h3>
+                      <div className="install-command">
+                        <code>{installCommand(selected)}</code>
+                        <button
+                          className={copied ? "is-copied" : undefined}
+                          type="button"
+                          onClick={() => copyInstallCommand(selected)}
+                          aria-label={copied ? "Install command copied" : "Copy install command"}
+                        >
+                          <span className="copy-icon" aria-hidden="true">
+                            {copied ? <Check size={19} /> : <Copy size={19} />}
+                          </span>
+                          <span className="sr-only" aria-live="polite">
+                            {copied ? "Copied to clipboard" : ""}
+                          </span>
+                        </button>
+                      </div>
+                    </section>
+                    {selected.dependencies.length > 0 && (
+                      <section className="detail-section">
+                        <h3>Dependencies</h3>
+                        <ul className="dependencies">
+                          {selected.dependencies.map((dependency) => (
+                            <li key={dependency}>{dependency}</li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                    {selected.installs30d && (
+                      <section className="detail-section analytics">
+                        <h3>Analytics</h3>
+                        <p>
+                          30-day installs: <strong>{selected.installs30d.toLocaleString("en-US")}</strong>
+                        </p>
+                      </section>
+                    )}
+                    <a className="open-package" href={packagePath(selected)}>
+                      Open package page <ExternalLink size={15} aria-hidden="true" />
+                    </a>
+                  </div>
+                ) : (
+                  <div className="detail-placeholder">Start typing to inspect a package.</div>
+                )}
+              </aside>
             </>
           )}
-
         </m.section>
       </MotionConfig>
     </LazyMotion>
