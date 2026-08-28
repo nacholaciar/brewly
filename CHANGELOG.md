@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.5.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.4.0...brewly-v0.5.0) (2026-08-28)
+
+
+### Features
+
+* **ui:** add Brewly brand assets ([621b405](https://github.com/nacholaciar/brewly/commit/621b4057b88cc2019a35c1be344cdca2f81831fc))
+
 ## [0.4.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.3.0...brewly-v0.4.0) (2026-08-28)
 
 
