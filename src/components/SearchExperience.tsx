@@ -1,13 +1,13 @@
-import {
-  ArrowDown,
-  ArrowUp,
-  Check,
-  Copy,
-  ExternalLink,
-  Package as PackageIcon,
-  Search,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import ArrowDown from "lucide-react/dist/esm/icons/arrow-down";
+import ArrowUp from "lucide-react/dist/esm/icons/arrow-up";
+import Check from "lucide-react/dist/esm/icons/check";
+import Copy from "lucide-react/dist/esm/icons/copy";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
+import PackageIcon from "lucide-react/dist/esm/icons/package";
+import Search from "lucide-react/dist/esm/icons/search";
+import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from "motion/react";
+import * as m from "motion/react-m";
+import { startTransition, useEffect, useRef, useState } from "react";
 import {
   installCommand,
   packagePath,
@@ -87,7 +87,9 @@ export default function SearchExperience({ initialPackages }: Props) {
 
       setIsSearching(true);
       const catalog = await loadCatalog(initialPackages);
-      if (!cancelled) setResults(localSearch(catalog, query));
+      if (!cancelled) {
+        startTransition(() => setResults(localSearch(catalog, query)));
+      }
       if (!cancelled) setIsSearching(false);
     }, 70);
 
@@ -136,126 +138,147 @@ export default function SearchExperience({ initialPackages }: Props) {
   }
 
   return (
-    <section className="command-surface" aria-label="Package search">
-      <div className="search-column">
-        <label className="search-box" htmlFor="package-search">
-          <Search aria-hidden="true" size={24} strokeWidth={1.8} />
-          <span className="sr-only">Search formulae and casks</span>
-          <input
-            ref={inputRef}
-            id="package-search"
-            type="search"
-            autoComplete="off"
-            autoFocus
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={onKeyDown}
-            placeholder="Search formulae and casks…"
-            aria-controls="search-results"
-            aria-activedescendant={selected ? `result-${selected.type}-${selected.slug}` : undefined}
-          />
-          <kbd>⌘ K</kbd>
-        </label>
+    <LazyMotion features={domAnimation} strict>
+      <MotionConfig reducedMotion="user">
+        <m.section
+          className="command-surface"
+          aria-label="Package search"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="search-column">
+            <label className="search-box" htmlFor="package-search">
+              <Search aria-hidden="true" size={24} strokeWidth={1.8} />
+              <span className="sr-only">Search formulae and casks</span>
+              <input
+                ref={inputRef}
+                id="package-search"
+                type="search"
+                autoComplete="off"
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder="Search formulae and casks…"
+                aria-controls="search-results"
+                aria-activedescendant={selected ? `result-${selected.type}-${selected.slug}` : undefined}
+              />
+              <kbd>⌘ K</kbd>
+            </label>
 
-        <div id="search-results" className="results" role="listbox" aria-label="Search results">
-          {results.map((item, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <button
-                type="button"
-                id={`result-${item.type}-${item.slug}`}
-                role="option"
-                aria-selected={isActive}
-                className={`result-row ${isActive ? "is-active" : ""}`}
-                key={`${item.type}-${item.slug}`}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => window.location.assign(packagePath(item))}
-              >
-                <span className="result-icon" aria-hidden="true">
-                  <PackageIcon size={22} strokeWidth={1.7} />
-                </span>
-                <span className="result-copy">
-                  <strong>{item.name}</strong>
-                  <span>{item.description}</span>
-                </span>
-                <span className={`type-label type-${item.type}`}>
-                  {item.type === "formula" ? "Formula" : "Cask"}
-                </span>
-                <code>{item.version}</code>
-              </button>
-            );
-          })}
-          {results.length === 0 && (
-            <div className="empty-state" role="status">
-              <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
-              {!isSearching && <span>Try a name, command, or description.</span>}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <aside className="detail-panel" aria-live="polite">
-        {selected ? (
-          <>
-            <header className="detail-header">
-              <span className="detail-icon" aria-hidden="true">
-                <PackageIcon size={32} strokeWidth={1.55} />
-              </span>
-              <div>
-                <h2>{selected.name}</h2>
-                <code>{selected.version}</code>
-              </div>
-            </header>
-            <p className="detail-description">{selected.description}</p>
-            <dl className="metadata">
-              <div>
-                <dt>Homepage</dt>
-                <dd><a href={selected.homepage}>{new URL(selected.homepage).hostname}</a></dd>
-              </div>
-              {selected.license && (
-                <div>
-                  <dt>License</dt>
-                  <dd>{selected.license}</dd>
+            <div id="search-results" className="results" role="listbox" aria-label="Search results">
+              {results.map((item, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <button
+                    type="button"
+                    id={`result-${item.type}-${item.slug}`}
+                    role="option"
+                    aria-selected={isActive}
+                    className={`result-row ${isActive ? "is-active" : ""}`}
+                    key={`${item.type}-${item.slug}`}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => window.location.assign(packagePath(item))}
+                  >
+                    <span className="result-icon" aria-hidden="true">
+                      <PackageIcon size={22} strokeWidth={1.7} />
+                    </span>
+                    <span className="result-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.description}</span>
+                    </span>
+                    <span className={`type-label type-${item.type}`}>
+                      {item.type === "formula" ? "Formula" : "Cask"}
+                    </span>
+                    <code>{item.version}</code>
+                  </button>
+                );
+              })}
+              {results.length === 0 && (
+                <div className="empty-state" role="status">
+                  <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
+                  {!isSearching && <span>Try a name, command, or description.</span>}
                 </div>
               )}
-            </dl>
-            <section className="detail-section">
-              <h3>Install</h3>
-              <div className="install-command">
-                <code>{installCommand(selected)}</code>
-                <button type="button" onClick={copyInstallCommand} aria-label="Copy install command">
-                  {copied ? <Check size={19} /> : <Copy size={19} />}
-                </button>
-              </div>
-            </section>
-            {selected.dependencies.length > 0 && (
-              <section className="detail-section">
-                <h3>Dependencies</h3>
-                <ul className="dependencies">
-                  {selected.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
-                </ul>
-              </section>
-            )}
-            {selected.installs30d && (
-              <section className="detail-section analytics">
-                <h3>Analytics</h3>
-                <p>30-day installs: <strong>{selected.installs30d.toLocaleString("en-US")}</strong></p>
-              </section>
-            )}
-            <a className="open-package" href={packagePath(selected)}>
-              Open package page <ExternalLink size={15} aria-hidden="true" />
-            </a>
-          </>
-        ) : (
-          <div className="detail-placeholder">Start typing to inspect a package.</div>
-        )}
-      </aside>
+            </div>
+          </div>
 
-      <div className="key-rail" aria-hidden="true">
-        <span><kbd><ArrowUp size={13} /><ArrowDown size={13} /></kbd> Navigate</span>
-        <span><kbd>↵</kbd> Open</span>
-        <span><kbd>Esc</kbd> Clear</span>
-      </div>
-    </section>
+          <aside className="detail-panel" aria-live="polite">
+            {selected ? (
+              <div className="detail-content">
+                  <header className="detail-header">
+                    <span className="detail-icon" aria-hidden="true">
+                      <PackageIcon size={32} strokeWidth={1.55} />
+                    </span>
+                    <div>
+                      <h2>{selected.name}</h2>
+                      <code>{selected.version}</code>
+                    </div>
+                  </header>
+                  <p className="detail-description">{selected.description}</p>
+                  <dl className="metadata">
+                    <div>
+                      <dt>Homepage</dt>
+                      <dd><a href={selected.homepage}>{new URL(selected.homepage).hostname}</a></dd>
+                    </div>
+                    {selected.license && (
+                      <div>
+                        <dt>License</dt>
+                        <dd>{selected.license}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  <section className="detail-section">
+                    <h3>Install</h3>
+                    <div className="install-command">
+                      <code>{installCommand(selected)}</code>
+                      <button type="button" onClick={copyInstallCommand} aria-label="Copy install command">
+                        <AnimatePresence initial={false} mode="wait">
+                          <m.span
+                            className="copy-icon"
+                            key={copied ? "copied" : "copy"}
+                            initial={{ opacity: 0, scale: 0.7 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.7 }}
+                            transition={{ type: "spring", stiffness: 600, damping: 28 }}
+                          >
+                            {copied ? <Check size={19} /> : <Copy size={19} />}
+                          </m.span>
+                        </AnimatePresence>
+                      </button>
+                    </div>
+                  </section>
+                  {selected.dependencies.length > 0 && (
+                    <section className="detail-section">
+                      <h3>Dependencies</h3>
+                      <ul className="dependencies">
+                        {selected.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
+                      </ul>
+                    </section>
+                  )}
+                  {selected.installs30d && (
+                    <section className="detail-section analytics">
+                      <h3>Analytics</h3>
+                      <p>30-day installs: <strong>{selected.installs30d.toLocaleString("en-US")}</strong></p>
+                    </section>
+                  )}
+                  <a className="open-package" href={packagePath(selected)}>
+                    Open package page <ExternalLink size={15} aria-hidden="true" />
+                  </a>
+              </div>
+            ) : (
+              <div className="detail-placeholder">Start typing to inspect a package.</div>
+            )}
+          </aside>
+
+          <div className="key-rail" aria-hidden="true">
+            <span><kbd><ArrowUp size={13} /><ArrowDown size={13} /></kbd> Navigate</span>
+            <span><kbd>↵</kbd> Open</span>
+            <span><kbd>Esc</kbd> Clear</span>
+          </div>
+        </m.section>
+      </MotionConfig>
+    </LazyMotion>
   );
 }
