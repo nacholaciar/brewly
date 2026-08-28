@@ -96,61 +96,6 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             <p>{item.description}</p>
           </div>
         </div>
-
-        <div className="package-detail-sections">
-          <section>
-            <h2>Details</h2>
-            <dl className="metadata package-detail-metadata">
-              <div>
-                <dt>Homepage</dt>
-                <dd>
-                  <a href={item.homepage}>{new URL(item.homepage).hostname}</a>
-                </dd>
-              </div>
-              <div>
-                <dt>Type</dt>
-                <dd>{item.type === "formula" ? "Formula" : "Cask"}</dd>
-              </div>
-              {item.license && (
-                <div>
-                  <dt>License</dt>
-                  <dd>{item.license}</dd>
-                </div>
-              )}
-            </dl>
-          </section>
-
-          {item.dependencies.length > 0 && (
-            <section>
-              <h2>Dependencies</h2>
-              <ul className="dependencies">
-                {item.dependencies.map((dependency) => (
-                  <li key={dependency}>{dependency}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
-            <section>
-              <h2>Package data</h2>
-              <dl className="metadata package-detail-metadata">
-                {item.installs30d && (
-                  <div>
-                    <dt>30-day installs</dt>
-                    <dd>{item.installs30d.toLocaleString("en-US")}</dd>
-                  </div>
-                )}
-                {(item.aliases?.length ?? 0) > 0 && (
-                  <div>
-                    <dt>Aliases</dt>
-                    <dd>{item.aliases?.join(", ")}</dd>
-                  </div>
-                )}
-              </dl>
-            </section>
-          )}
-        </div>
       </header>
 
       <div className="package-detail-grid">
@@ -173,6 +118,61 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             </button>
           </div>
         </section>
+      </div>
+
+      <div className="package-detail-sections">
+        <section className="package-detail-section-details">
+          <h2>Details</h2>
+          <dl className="metadata package-detail-metadata">
+            <div>
+              <dt>Homepage</dt>
+              <dd>
+                <a href={item.homepage}>{new URL(item.homepage).hostname}</a>
+              </dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{item.type === "formula" ? "Formula" : "Cask"}</dd>
+            </div>
+            {item.license && (
+              <div>
+                <dt>License</dt>
+                <dd>{item.license}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
+
+        {item.dependencies.length > 0 && (
+          <section className="package-detail-section-dependencies">
+            <h2>Dependencies</h2>
+            <ul className="dependencies">
+              {item.dependencies.map((dependency) => (
+                <li key={dependency}>{dependency}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
+          <section className="package-detail-section-data">
+            <h2>Package data</h2>
+            <dl className="metadata package-detail-metadata">
+              {item.installs30d && (
+                <div>
+                  <dt>30-day installs</dt>
+                  <dd>{item.installs30d.toLocaleString("en-US")}</dd>
+                </div>
+              )}
+              {(item.aliases?.length ?? 0) > 0 && (
+                <div>
+                  <dt>Aliases</dt>
+                  <dd>{item.aliases?.join(", ")}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+        )}
       </div>
     </article>
   );
