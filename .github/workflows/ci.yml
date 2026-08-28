@@ -22,6 +22,6 @@ jobs:
       - run: bun run data:sync
       - run: bun run build
         env:
-          SITE_URL: https://brewly.example
+          SITE_URL: https://brewly.nacholaciar.workers.dev
           PUBLIC_REPOSITORY_URL: https://github.com/nacholaciar/brewly
       - run: bun run deploy:dry-run

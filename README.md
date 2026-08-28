@@ -2,6 +2,8 @@
 
 Brewly is a fast, keyboard-first explorer for [Homebrew](https://brew.sh/) formulae and casks. It combines a Spotlight-style search experience with static, indexable package pages.
 
+Live at [brewly.nacholaciar.workers.dev](https://brewly.nacholaciar.workers.dev).
+
 > Brewly is an independent community project. It is not affiliated with, endorsed by, or maintained by Homebrew.
 
 ## Why Brewly?
