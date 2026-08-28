@@ -716,6 +716,11 @@ kbd {
   background: var(--surface-hover);
 }
 
+.install-command button.is-copied {
+  color: var(--accent);
+  background: var(--accent-wash);
+}
+
 .dependencies {
   padding: 0;
   margin: 0;

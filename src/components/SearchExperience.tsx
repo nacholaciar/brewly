@@ -6,7 +6,7 @@ import Copy from "lucide-react/dist/esm/icons/copy";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import PackageIcon from "lucide-react/dist/esm/icons/package";
 import Search from "lucide-react/dist/esm/icons/search";
-import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from "motion/react";
+import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
 import * as m from "motion/react-m";
 import { startTransition, useEffect, useRef, useState } from "react";
 import {
@@ -158,19 +158,18 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
           <h2>Install</h2>
           <div className="install-command">
             <code>{installCommand(item)}</code>
-            <button type="button" onClick={() => onCopy(item)} aria-label="Copy install command">
-              <AnimatePresence initial={false}>
-                <m.span
-                  className="copy-icon"
-                  key={copied ? "copied" : "copy"}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.08, ease: "easeOut" }}
-                >
-                  {copied ? <Check size={19} /> : <Copy size={19} />}
-                </m.span>
-              </AnimatePresence>
+            <button
+              className={copied ? "is-copied" : undefined}
+              type="button"
+              onClick={() => onCopy(item)}
+              aria-label={copied ? "Install command copied" : "Copy install command"}
+            >
+              <span className="copy-icon" aria-hidden="true">
+                {copied ? <Check size={19} /> : <Copy size={19} />}
+              </span>
+              <span className="sr-only" aria-live="polite">
+                {copied ? "Copied to clipboard" : ""}
+              </span>
             </button>
           </div>
         </section>
@@ -409,19 +408,18 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
                     <h3>Install</h3>
                     <div className="install-command">
                       <code>{installCommand(selected)}</code>
-                      <button type="button" onClick={() => copyInstallCommand(selected)} aria-label="Copy install command">
-                        <AnimatePresence initial={false}>
-                          <m.span
-                            className="copy-icon"
-                            key={copied ? "copied" : "copy"}
-                            initial={{ opacity: 0, scale: 0.7 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.7 }}
-                            transition={{ duration: 0.08, ease: "easeOut" }}
-                          >
-                            {copied ? <Check size={19} /> : <Copy size={19} />}
-                          </m.span>
-                        </AnimatePresence>
+                      <button
+                        className={copied ? "is-copied" : undefined}
+                        type="button"
+                        onClick={() => copyInstallCommand(selected)}
+                        aria-label={copied ? "Install command copied" : "Copy install command"}
+                      >
+                        <span className="copy-icon" aria-hidden="true">
+                          {copied ? <Check size={19} /> : <Copy size={19} />}
+                        </span>
+                        <span className="sr-only" aria-live="polite">
+                          {copied ? "Copied to clipboard" : ""}
+                        </span>
                       </button>
                     </div>
                   </section>
