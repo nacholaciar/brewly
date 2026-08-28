@@ -1,0 +1,80 @@
+# Brewly
+
+Brewly is a fast, keyboard-first explorer for [Homebrew](https://brew.sh/) formulae and casks. It combines a Spotlight-style search experience with static, indexable package pages.
+
+> Brewly is an independent community project. It is not affiliated with, endorsed by, or maintained by Homebrew.
+
+## Why Brewly?
+
+- Search while you type without downloading the entire Homebrew catalogue.
+- Navigate with the keyboard: `⌘ K` / `Ctrl K`, arrow keys, `Enter`, and `Escape`.
+- Inspect the install command, dependencies, licence, homepage, and analytics in place.
+- Give every formula and cask its own static, crawlable URL.
+- Ship HTML and CSS by default, with React limited to the search experience.
+
+## Stack
+
+- Astro and TypeScript
+- Tailwind CSS v4
+- React island for interactive search
+- A lazy-loaded static search index, kept separate from the initial page bundle
+- Zod for Homebrew API validation
+- Bun for scripts and package management
+- Cloudflare Workers Static Assets for hosting
+
+## Local development
+
+Requirements: [Bun](https://bun.sh/) 1.4 or newer and Node.js 22 or newer.
+
+```bash
+bun install
+bun run dev
+```
+
+The repository includes a small offline dataset, so development works immediately. To build against the current Homebrew catalogue:
+
+```bash
+bun run data:sync
+SITE_URL=http://localhost:4321 bun run build
+bun run preview
+```
+
+The generated catalogue is stored in `.cache/` and is intentionally not committed.
+
+## Production build
+
+Set the canonical site URL and repository link, synchronise the data, and build:
+
+```bash
+cp .env.example .env
+bun run data:sync
+bun run build
+```
+
+The output is written to `dist/`. The search catalogue is emitted as a cacheable static asset and loaded only when the search experience needs it.
+
+## Cloudflare
+
+`wrangler.jsonc` configures a static-assets-only Worker. Validate the upload locally with:
+
+```bash
+bun run deploy:dry-run
+```
+
+`bun run deploy` publishes the contents of `dist/`; use it only after authenticating Wrangler and setting `SITE_URL` to the final deployment URL.
+
+## Project status
+
+Brewly is in its initial public-development stage. The core search and package-page architecture is working; see the issue tracker for planned improvements.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md) before opening a pull request.
+
+## Data and attribution
+
+Package metadata is retrieved from the public [Homebrew JSON API](https://formulae.brew.sh/docs/api/). Homebrew and its catalogue repositories use the BSD 2-Clause licence. Brewly does not copy Homebrew's website implementation or visual identity. See [NOTICE.md](NOTICE.md) for attribution details.
+
+## Licence
+
+Brewly's original source code is available under the [MIT Licence](LICENSE).

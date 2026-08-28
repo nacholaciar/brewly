@@ -1,0 +1,63 @@
+---
+import { loadPackages } from "../../lib/homebrew-data";
+import { installCommand, packagePath, type BrewPackage } from "../../lib/packages";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export function getStaticPaths() {
+  return loadPackages()
+    .filter((item) => item.type === "formula")
+    .map((item) => ({ params: { slug: item.slug }, props: { item } }));
+}
+
+const { item } = Astro.props as { item: BrewPackage };
+const command = installCommand(item);
+---
+
+<BaseLayout
+  title={`${item.name} — Homebrew Formula | Brewly`}
+  description={`${item.description}. Install ${item.name} with Homebrew.`}
+  canonicalPath={packagePath(item)}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: item.name,
+    description: item.description,
+    softwareVersion: item.version,
+    url: item.homepage,
+    applicationCategory: "DeveloperApplication",
+  }}
+>
+  <article class="package-page">
+    <a class="back-link" href="/">← Search packages</a>
+    <header>
+      <p class="section-label">Formula</p>
+      <h1>{item.name}</h1>
+      <p>{item.description}</p>
+      <code class="version">{item.version}</code>
+    </header>
+    <section>
+      <h2>Install</h2>
+      <div class="install-command static-command">
+        <code>{command}</code>
+        <button class="copy-static" type="button" data-command={command} aria-label="Copy install command">Copy</button>
+      </div>
+    </section>
+    {item.dependencies.length > 0 && <section><h2>Dependencies</h2><ul class="dependencies">{item.dependencies.map((dependency) => <li>{dependency}</li>)}</ul></section>}
+    <section class="package-facts">
+      <h2>Details</h2>
+      <dl class="metadata">
+        <div><dt>Homepage</dt><dd><a href={item.homepage}>{item.homepage}</a></dd></div>
+        {item.license && <div><dt>License</dt><dd>{item.license}</dd></div>}
+      </dl>
+    </section>
+  </article>
+  <script>
+    document.querySelectorAll<HTMLButtonElement>(".copy-static").forEach((button) => {
+      button.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(button.dataset.command ?? "");
+        button.textContent = "Copied";
+        window.setTimeout(() => { button.textContent = "Copy"; }, 1600);
+      });
+    });
+  </script>
+</BaseLayout>

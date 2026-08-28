@@ -1,0 +1,15 @@
+---
+import SearchExperience from "../components/SearchExperience";
+import { packages } from "../data/packages";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Find any <span>Homebrew</span> package.</h1>
+      <p>Formulae and casks, instantly.</p>
+    </div>
+    <SearchExperience initialPackages={packages} client:load />
+  </section>
+</BaseLayout>
