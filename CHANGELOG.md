@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.6.1](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.0...brewly-v0.6.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* format web app manifest ([fbb8417](https://github.com/nacholaciar/brewly/commit/fbb841774aa48244984abbe7d7cf653ac13bd5e6))
+
 ## [0.6.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.5.0...brewly-v0.6.0) (2026-08-28)
 
 
