@@ -1,4 +1,5 @@
 import ArrowDown from "lucide-react/dist/esm/icons/arrow-down";
+import ArrowLeft from "lucide-react/dist/esm/icons/arrow-left";
 import ArrowUp from "lucide-react/dist/esm/icons/arrow-up";
 import Check from "lucide-react/dist/esm/icons/check";
 import Copy from "lucide-react/dist/esm/icons/copy";
@@ -16,6 +17,15 @@ import {
 
 type Props = {
   initialPackages: BrewPackage[];
+  initialPackage?: BrewPackage;
+};
+
+type PackageDetailViewProps = {
+  copied: boolean;
+  headingLevel: "h1" | "h2";
+  item: BrewPackage;
+  onBack: () => void;
+  onCopy: (item: BrewPackage) => void;
 };
 
 let catalogPromise: Promise<BrewPackage[]> | null = null;
@@ -66,12 +76,113 @@ function scorePackage(item: BrewPackage, rawQuery: string) {
   return 10;
 }
 
-export default function SearchExperience({ initialPackages }: Props) {
-  const [query, setQuery] = useState("post");
-  const [results, setResults] = useState(() => localSearch(initialPackages, "post"));
+function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy }: PackageDetailViewProps) {
+  return (
+    <article className="package-detail-view">
+      <div className="package-detail-toolbar">
+        <button type="button" onClick={onBack}>
+          <ArrowLeft size={16} aria-hidden="true" />
+          Back to results
+        </button>
+        <span className={`type-label type-${item.type}`}>
+          {item.type === "formula" ? "Formula" : "Cask"}
+        </span>
+      </div>
+
+      <header className="package-detail-hero">
+        <span className="package-detail-icon" aria-hidden="true">
+          <PackageIcon size={38} strokeWidth={1.45} />
+        </span>
+        <div>
+          <Heading>{item.name}</Heading>
+          <code>{item.version}</code>
+          <p>{item.description}</p>
+        </div>
+      </header>
+
+      <div className="package-detail-grid">
+        <section className="package-detail-install">
+          <h2>Install</h2>
+          <div className="install-command">
+            <code>{installCommand(item)}</code>
+            <button type="button" onClick={() => onCopy(item)} aria-label="Copy install command">
+              <AnimatePresence initial={false} mode="wait">
+                <m.span
+                  className="copy-icon"
+                  key={copied ? "copied" : "copy"}
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{ type: "spring", stiffness: 600, damping: 28 }}
+                >
+                  {copied ? <Check size={19} /> : <Copy size={19} />}
+                </m.span>
+              </AnimatePresence>
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <h2>Details</h2>
+          <dl className="metadata package-detail-metadata">
+            <div>
+              <dt>Homepage</dt>
+              <dd><a href={item.homepage}>{new URL(item.homepage).hostname}</a></dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{item.type === "formula" ? "Formula" : "Cask"}</dd>
+            </div>
+            {item.license && (
+              <div>
+                <dt>License</dt>
+                <dd>{item.license}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
+
+        {item.dependencies.length > 0 && (
+          <section>
+            <h2>Dependencies</h2>
+            <ul className="dependencies">
+              {item.dependencies.map((dependency) => <li key={dependency}>{dependency}</li>)}
+            </ul>
+          </section>
+        )}
+
+        {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
+          <section>
+            <h2>Package data</h2>
+            <dl className="metadata package-detail-metadata">
+              {item.installs30d && (
+                <div>
+                  <dt>30-day installs</dt>
+                  <dd>{item.installs30d.toLocaleString("en-US")}</dd>
+                </div>
+              )}
+              {(item.aliases?.length ?? 0) > 0 && (
+                <div>
+                  <dt>Aliases</dt>
+                  <dd>{item.aliases?.join(", ")}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export default function SearchExperience({ initialPackages, initialPackage }: Props) {
+  const initialQuery = initialPackage?.slug ?? "post";
+  const [query, setQuery] = useState(initialQuery);
+  const [results, setResults] = useState(() => localSearch(initialPackages, initialQuery));
   const [activeIndex, setActiveIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [openedPackage, setOpenedPackage] = useState<BrewPackage | null>(initialPackage ?? null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const selected = results[Math.min(activeIndex, results.length - 1)] ?? null;
@@ -112,6 +223,51 @@ export default function SearchExperience({ initialPackages }: Props) {
     return () => window.removeEventListener("keydown", openSearch);
   }, []);
 
+  useEffect(() => {
+    document.title = openedPackage
+      ? `${openedPackage.name} — Homebrew ${openedPackage.type === "formula" ? "Formula" : "Cask"} | Brewly`
+      : "Brewly — Find any Homebrew package";
+  }, [openedPackage]);
+
+  useEffect(() => {
+    function restoreHistoryState() {
+      if (window.location.pathname === "/") {
+        setOpenedPackage(null);
+        return;
+      }
+
+      if (initialPackage && window.location.pathname === packagePath(initialPackage)) {
+        setOpenedPackage(initialPackage);
+        return;
+      }
+
+      window.location.reload();
+    }
+
+    window.addEventListener("popstate", restoreHistoryState);
+    return () => window.removeEventListener("popstate", restoreHistoryState);
+  }, [initialPackage]);
+
+  function openPackage(item: BrewPackage) {
+    window.history.pushState({ brewlyPackage: true }, "", packagePath(item));
+    setOpenedPackage(item);
+    setCopied(false);
+  }
+
+  function returnToResults() {
+    window.history.replaceState({}, "", "/");
+    setOpenedPackage(null);
+    window.requestAnimationFrame(() => inputRef.current?.focus());
+  }
+
+  function updateQuery(value: string) {
+    if (openedPackage) {
+      window.history.replaceState({}, "", "/");
+      setOpenedPackage(null);
+    }
+    setQuery(value);
+  }
+
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -122,17 +278,20 @@ export default function SearchExperience({ initialPackages }: Props) {
       setActiveIndex((current) => Math.max(current - 1, 0));
     }
     if (event.key === "Enter" && selected) {
-      window.location.assign(packagePath(selected));
+      openPackage(selected);
     }
     if (event.key === "Escape") {
+      if (openedPackage) {
+        returnToResults();
+        return;
+      }
       setQuery("");
       inputRef.current?.blur();
     }
   }
 
-  async function copyInstallCommand() {
-    if (!selected) return;
-    await navigator.clipboard.writeText(installCommand(selected));
+  async function copyInstallCommand(item: BrewPackage) {
+    await navigator.clipboard.writeText(installCommand(item));
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1600);
   }
@@ -141,14 +300,13 @@ export default function SearchExperience({ initialPackages }: Props) {
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
         <m.section
-          className="command-surface"
+          className={`command-surface ${openedPackage ? "has-package-detail" : ""}`}
           aria-label="Package search"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="search-column">
-            <label className="search-box" htmlFor="package-search">
+          <label className="search-box" htmlFor="package-search">
               <Search aria-hidden="true" size={24} strokeWidth={1.8} />
               <span className="sr-only">Search formulae and casks</span>
               <input
@@ -158,15 +316,26 @@ export default function SearchExperience({ initialPackages }: Props) {
                 autoComplete="off"
                 autoFocus
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => updateQuery(event.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder="Search formulae and casks…"
                 aria-controls="search-results"
-                aria-activedescendant={selected ? `result-${selected.type}-${selected.slug}` : undefined}
+                aria-activedescendant={!openedPackage && selected ? `result-${selected.type}-${selected.slug}` : undefined}
               />
               <kbd>⌘ K</kbd>
-            </label>
+          </label>
 
+          {openedPackage ? (
+            <PackageDetailView
+              copied={copied}
+              headingLevel={initialPackage ? "h1" : "h2"}
+              item={openedPackage}
+              onBack={returnToResults}
+              onCopy={copyInstallCommand}
+            />
+          ) : (
+            <>
+          <div className="search-column">
             <div id="search-results" className="results" role="listbox" aria-label="Search results">
               {results.map((item, index) => {
                 const isActive = index === activeIndex;
@@ -179,7 +348,7 @@ export default function SearchExperience({ initialPackages }: Props) {
                     className={`result-row ${isActive ? "is-active" : ""}`}
                     key={`${item.type}-${item.slug}`}
                     onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => window.location.assign(packagePath(item))}
+                    onClick={() => openPackage(item)}
                   >
                     <span className="result-icon" aria-hidden="true">
                       <PackageIcon size={22} strokeWidth={1.7} />
@@ -233,7 +402,7 @@ export default function SearchExperience({ initialPackages }: Props) {
                     <h3>Install</h3>
                     <div className="install-command">
                       <code>{installCommand(selected)}</code>
-                      <button type="button" onClick={copyInstallCommand} aria-label="Copy install command">
+                      <button type="button" onClick={() => copyInstallCommand(selected)} aria-label="Copy install command">
                         <AnimatePresence initial={false} mode="wait">
                           <m.span
                             className="copy-icon"
@@ -271,11 +440,22 @@ export default function SearchExperience({ initialPackages }: Props) {
               <div className="detail-placeholder">Start typing to inspect a package.</div>
             )}
           </aside>
+            </>
+          )}
 
           <div className="key-rail" aria-hidden="true">
-            <span><kbd><ArrowUp size={13} /><ArrowDown size={13} /></kbd> Navigate</span>
-            <span><kbd>↵</kbd> Open</span>
-            <span><kbd>Esc</kbd> Clear</span>
+            {openedPackage ? (
+              <>
+                <span><kbd>Esc</kbd> Results</span>
+                <span>Type to search again</span>
+              </>
+            ) : (
+              <>
+                <span><kbd><ArrowUp size={13} /><ArrowDown size={13} /></kbd> Navigate</span>
+                <span><kbd>↵</kbd> Open</span>
+                <span><kbd>Esc</kbd> Clear</span>
+              </>
+            )}
           </div>
         </m.section>
       </MotionConfig>

@@ -1,6 +1,8 @@
 ---
 import { loadPackages } from "../../lib/homebrew-data";
-import { installCommand, packagePath, type BrewPackage } from "../../lib/packages";
+import SearchExperience from "../../components/SearchExperience";
+import { packages as seedPackages } from "../../data/packages";
+import { packagePath, type BrewPackage } from "../../lib/packages";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
@@ -10,7 +12,7 @@ export function getStaticPaths() {
 }
 
 const { item } = Astro.props as { item: BrewPackage };
-const command = installCommand(item);
+const initialPackages = [item, ...seedPackages.filter((candidate) => candidate.slug !== item.slug)];
 ---
 
 <BaseLayout
@@ -27,37 +29,7 @@ const command = installCommand(item);
     applicationCategory: "DeveloperApplication",
   }}
 >
-  <article class="package-page">
-    <a class="back-link" href="/">← Search packages</a>
-    <header>
-      <p class="section-label">Formula</p>
-      <h1>{item.name}</h1>
-      <p>{item.description}</p>
-      <code class="version">{item.version}</code>
-    </header>
-    <section>
-      <h2>Install</h2>
-      <div class="install-command static-command">
-        <code>{command}</code>
-        <button class="copy-static" type="button" data-command={command} aria-label="Copy install command">Copy</button>
-      </div>
-    </section>
-    {item.dependencies.length > 0 && <section><h2>Dependencies</h2><ul class="dependencies">{item.dependencies.map((dependency) => <li>{dependency}</li>)}</ul></section>}
-    <section class="package-facts">
-      <h2>Details</h2>
-      <dl class="metadata">
-        <div><dt>Homepage</dt><dd><a href={item.homepage}>{item.homepage}</a></dd></div>
-        {item.license && <div><dt>License</dt><dd>{item.license}</dd></div>}
-      </dl>
-    </section>
-  </article>
-  <script>
-    document.querySelectorAll<HTMLButtonElement>(".copy-static").forEach((button) => {
-      button.addEventListener("click", async () => {
-        await navigator.clipboard.writeText(button.dataset.command ?? "");
-        button.textContent = "Copied";
-        window.setTimeout(() => { button.textContent = "Copy"; }, 1600);
-      });
-    });
-  </script>
+  <section class="hero package-explorer">
+    <SearchExperience initialPackages={initialPackages} initialPackage={item} client:load />
+  </section>
 </BaseLayout>
