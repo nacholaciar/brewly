@@ -3,6 +3,9 @@ name: Deploy
 on:
   push:
     branches: [main]
+  schedule:
+    # Run away from the top of the hour, when scheduled Actions are busiest.
+    - cron: "17 */2 * * *"
   workflow_dispatch:
 
 permissions:
@@ -25,18 +28,53 @@ jobs:
         with:
           bun-version: 1.4.0
       - run: bun install --frozen-lockfile
-      - run: bun run check
+      - name: Restore the last deployed news fingerprint
+        uses: actions/cache/restore@v4
+        with:
+          path: .sync-state/news.sha256
+          key: news-feed-${{ github.run_id }}
+          restore-keys: |
+            news-feed-
       - run: bun run data:sync
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: bun run build
+      - name: Check whether the news feed changed
+        id: news
+        shell: bash
+        run: |
+          current="$(sha256sum .cache/news.json | cut -d ' ' -f 1)"
+          previous="$(cat .sync-state/news.sha256 2>/dev/null || true)"
+
+          if [[ "$current" == "$previous" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "The news feed has not changed; skipping the scheduled deploy."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "The news feed changed; continuing with the deploy."
+          fi
+
+          mkdir -p .sync-state
+          printf '%s\n' "$current" > .sync-state/news.sha256
+      - name: Check the project
+        if: github.event_name != 'schedule' || steps.news.outputs.changed == 'true'
+        run: bun run check
+      - name: Build the production site
+        if: github.event_name != 'schedule' || steps.news.outputs.changed == 'true'
+        run: bun run build
         env:
           SITE_URL: https://brewly.nacholaciar.workers.dev
           PUBLIC_REPOSITORY_URL: https://github.com/nacholaciar/brewly
       - name: Deploy to Cloudflare Workers
+        if: github.event_name != 'schedule' || steps.news.outputs.changed == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: 4.127.0
           command: deploy
+      - name: Save the deployed news fingerprint
+        if: github.event_name != 'schedule' || steps.news.outputs.changed == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .sync-state/news.sha256
+          key: news-feed-${{ github.run_id }}
