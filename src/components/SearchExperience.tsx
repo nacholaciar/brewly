@@ -6,7 +6,14 @@ import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import PackageIcon from "lucide-react/dist/esm/icons/package";
 import Search from "lucide-react/dist/esm/icons/search";
 import { startTransition, useEffect, useRef, useState } from "react";
-import { type BrewPackage, installCommand, packagePath } from "../lib/packages";
+import {
+  apiUrl,
+  type BrewPackage,
+  installCommand,
+  type PackageDownload,
+  packagePath,
+  pullRequestsUrl,
+} from "../lib/packages";
 
 type Props = {
   initialPackages: BrewPackage[];
@@ -56,8 +63,10 @@ function scorePackage(item: BrewPackage, rawQuery: string) {
   if (!query) return 1;
   const name = item.name.toLowerCase();
   const slug = item.slug.toLowerCase();
-  const searchableText = [name, slug, item.description, ...(item.aliases ?? [])].join(" ").toLowerCase();
-  const fuzzyTargets = [name, slug, ...(item.aliases ?? [])].join(" ").toLowerCase();
+  const searchableText = [name, slug, item.description, ...(item.aliases ?? []), ...(item.previousNames ?? [])]
+    .join(" ")
+    .toLowerCase();
+  const fuzzyTargets = [name, slug, ...(item.aliases ?? []), ...(item.previousNames ?? [])].join(" ").toLowerCase();
   if (name === query || slug === query) return 100;
   if (name.startsWith(query) || slug.startsWith(query)) return 80;
   if (name.includes(query) || slug.includes(query)) return 60;
@@ -70,6 +79,98 @@ function scorePackage(item: BrewPackage, rawQuery: string) {
     cursor += 1;
   }
   return 10;
+}
+
+function SourceLinks({ item }: { item: BrewPackage }) {
+  return (
+    <ul className="source-links">
+      <li>
+        <a href={pullRequestsUrl(item)}>Pull requests</a>
+      </li>
+      <li>
+        <a href={apiUrl(item)}>JSON API</a>
+      </li>
+      {item.sourceUrl && (
+        <li>
+          <a href={item.sourceUrl}>{item.type === "cask" ? "Cask code" : "Formula code"}</a>
+        </li>
+      )}
+    </ul>
+  );
+}
+
+function AnalyticsMetadata({ item }: { item: BrewPackage }) {
+  return (
+    <>
+      {item.installs30d !== undefined && (
+        <div>
+          <dt>30-day installs</dt>
+          <dd>{item.installs30d.toLocaleString("en-US")}</dd>
+        </div>
+      )}
+      {item.installs90d !== undefined && (
+        <div>
+          <dt>90-day installs</dt>
+          <dd>{item.installs90d.toLocaleString("en-US")}</dd>
+        </div>
+      )}
+      {item.installs365d !== undefined && (
+        <div>
+          <dt>365-day installs</dt>
+          <dd>{item.installs365d.toLocaleString("en-US")}</dd>
+        </div>
+      )}
+    </>
+  );
+}
+
+function DownloadTable({ downloads }: { downloads: PackageDownload[] }) {
+  return (
+    <div className="download-table-wrap">
+      <table className="download-table">
+        <thead>
+          <tr>
+            <th>Architecture</th>
+            <th>Platforms</th>
+            <th>Version</th>
+            <th>Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          {downloads.map((download) => (
+            <tr key={[download.architecture, download.platforms.join(), download.url].join("-")}>
+              <td>{download.architecture ?? "Universal"}</td>
+              <td>{download.platforms.join(", ")}</td>
+              <td>{download.version ?? "Current"}</td>
+              <td>
+                <a href={download.url}>File</a>
+                {download.sha256 && (
+                  <details className="checksum">
+                    <summary>SHA-256</summary>
+                    <code>{download.sha256}</code>
+                  </details>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PackageStatusNotice({ item }: { item: BrewPackage }) {
+  const status = item.disabled ?? item.deprecated;
+  if (!status) return null;
+  const label = item.disabled ? "Disabled" : "Deprecated";
+  return (
+    <aside className="package-status-notice" aria-label={`${label} package`}>
+      <strong>{label}</strong>
+      {status.date && <span> since {status.date}</span>}
+      {status.reason && <span>: {status.reason}</span>}
+      {status.replacement && <span>. Use {status.replacement} instead.</span>}
+    </aside>
+  );
 }
 
 function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy }: PackageDetailViewProps) {
@@ -94,6 +195,7 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
             <p>{item.description}</p>
           </div>
         </div>
+        <PackageStatusNotice item={item} />
       </header>
 
       <div className="package-detail-grid">
@@ -138,8 +240,44 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
                 <dd>{item.license}</dd>
               </div>
             )}
+            {item.tap && (
+              <div>
+                <dt>Tap</dt>
+                <dd>{item.tap}</dd>
+              </div>
+            )}
+            {item.macosRequirement && (
+              <div>
+                <dt>Requirements</dt>
+                <dd>{item.macosRequirement}</dd>
+              </div>
+            )}
+            {item.autoUpdates !== undefined && (
+              <div>
+                <dt>Auto-updates</dt>
+                <dd>{item.autoUpdates ? "Yes" : "No"}</dd>
+              </div>
+            )}
+            {item.container && (
+              <div>
+                <dt>Container</dt>
+                <dd>{item.container}</dd>
+              </div>
+            )}
           </dl>
         </section>
+
+        <section className="package-detail-section-sources">
+          <h2>Sources</h2>
+          <SourceLinks item={item} />
+        </section>
+
+        {(item.downloads?.length ?? 0) > 0 && (
+          <section className="package-detail-section-downloads">
+            <h2>Supported platforms</h2>
+            <DownloadTable downloads={item.downloads ?? []} />
+          </section>
+        )}
 
         {item.dependencies.length > 0 && (
           <section className="package-detail-section-dependencies">
@@ -152,23 +290,62 @@ function PackageDetailView({ copied, headingLevel: Heading, item, onBack, onCopy
           </section>
         )}
 
-        {(item.installs30d || (item.aliases?.length ?? 0) > 0) && (
+        {(item.installs30d !== undefined ||
+          item.installs90d !== undefined ||
+          item.installs365d !== undefined ||
+          (item.aliases?.length ?? 0) > 0 ||
+          (item.previousNames?.length ?? 0) > 0) && (
           <section className="package-detail-section-data">
             <h2>Package data</h2>
             <dl className="metadata package-detail-metadata">
-              {item.installs30d && (
-                <div>
-                  <dt>30-day installs</dt>
-                  <dd>{item.installs30d.toLocaleString("en-US")}</dd>
-                </div>
-              )}
+              <AnalyticsMetadata item={item} />
               {(item.aliases?.length ?? 0) > 0 && (
                 <div>
                   <dt>Aliases</dt>
                   <dd>{item.aliases?.join(", ")}</dd>
                 </div>
               )}
+              {(item.previousNames?.length ?? 0) > 0 && (
+                <div>
+                  <dt>Previous names</dt>
+                  <dd>{item.previousNames?.join(", ")}</dd>
+                </div>
+              )}
             </dl>
+          </section>
+        )}
+
+        {((item.conflicts?.length ?? 0) > 0 || (item.artifacts?.length ?? 0) > 0) && (
+          <section className="package-detail-section-installation">
+            <h2>Installation data</h2>
+            <dl className="metadata package-detail-metadata">
+              {(item.artifacts?.length ?? 0) > 0 && (
+                <div>
+                  <dt>Installs</dt>
+                  <dd>{item.artifacts?.join(", ")}</dd>
+                </div>
+              )}
+              {(item.conflicts?.length ?? 0) > 0 && (
+                <div>
+                  <dt>Conflicts with</dt>
+                  <dd>{item.conflicts?.join(", ")}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+        )}
+
+        {(item.languages?.length ?? 0) > 0 && (
+          <section className="package-detail-section-languages">
+            <h2>Languages</h2>
+            <p className="package-list-copy">{item.languages?.join(", ")}</p>
+          </section>
+        )}
+
+        {item.caveats && (
+          <section className="package-detail-section-caveats">
+            <h2>Caveats</h2>
+            <pre className="caveats-copy">{item.caveats}</pre>
           </section>
         )}
       </div>
@@ -228,6 +405,18 @@ function PackagePreview({ copied, item, pinned, onCopy }: PackagePreviewProps) {
             <dd>{item.license}</dd>
           </div>
         )}
+        {item.macosRequirement && (
+          <div>
+            <dt>Requirements</dt>
+            <dd>{item.macosRequirement}</dd>
+          </div>
+        )}
+        {item.autoUpdates !== undefined && (
+          <div>
+            <dt>Auto-updates</dt>
+            <dd>{item.autoUpdates ? "Yes" : "No"}</dd>
+          </div>
+        )}
         {(item.aliases?.length ?? 0) > 0 && (
           <div>
             <dt>Aliases</dt>
@@ -235,6 +424,7 @@ function PackagePreview({ copied, item, pinned, onCopy }: PackagePreviewProps) {
           </div>
         )}
       </dl>
+      <PackageStatusNotice item={item} />
       {item.dependencies.length > 0 && (
         <section className="detail-section">
           <h3>Dependencies</h3>
@@ -245,12 +435,12 @@ function PackagePreview({ copied, item, pinned, onCopy }: PackagePreviewProps) {
           </ul>
         </section>
       )}
-      {item.installs30d && (
+      {(item.installs30d !== undefined || item.installs90d !== undefined || item.installs365d !== undefined) && (
         <section className="detail-section analytics">
           <h3>Analytics</h3>
-          <p>
-            30-day installs: <strong>{item.installs30d.toLocaleString("en-US")}</strong>
-          </p>
+          <dl className="metadata compact-metadata">
+            <AnalyticsMetadata item={item} />
+          </dl>
         </section>
       )}
       <a className="open-package" href={packagePath(item)} data-astro-prefetch="hover">
@@ -365,14 +555,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
   }, [initialPackage]);
 
   function openPackage(item: BrewPackage) {
-    if (window.matchMedia("(max-width: 600px)").matches) {
-      void navigate(packagePath(item));
-      return;
-    }
-
-    window.history.pushState({ brewlyPackage: true }, "", packagePath(item));
-    setOpenedPackage(item);
-    setCopied(false);
+    void navigate(packagePath(item));
   }
 
   function returnToResults() {

@@ -42,6 +42,24 @@ export const packages: BrewPackage[] = [
     description: "API platform for building and using APIs",
     homepage: "https://www.postman.com/",
     dependencies: [],
+    tap: "homebrew/cask",
+    macosRequirement: "macOS >= 11",
+    autoUpdates: true,
+    artifacts: ["Postman.app"],
+    downloads: [
+      {
+        architecture: "Apple Silicon",
+        platforms: ["Golden Gate", "Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey", "Big Sur"],
+        url: "https://dl.pstmn.io/download/version/11.16.0/osx_arm64",
+        version: "11.16.0",
+      },
+      {
+        architecture: "Intel",
+        platforms: ["Golden Gate", "Tahoe", "Sequoia", "Sonoma", "Ventura", "Monterey", "Big Sur"],
+        url: "https://dl.pstmn.io/download/version/11.16.0/osx64",
+        version: "11.16.0",
+      },
+    ],
   },
   {
     slug: "postico",
