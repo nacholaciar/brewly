@@ -1,5 +1,8 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import Github from "lucide-react/dist/esm/icons/github";
+import Info from "lucide-react/dist/esm/icons/info";
+import Newspaper from "lucide-react/dist/esm/icons/newspaper";
 import { serializeJsonLd } from "../lib/json-ld";
 import "../styles/global.css";
 
@@ -72,9 +75,18 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
       </a>
       <div class="header-actions">
         <nav aria-label="Primary navigation">
-          <a href="/news" data-astro-prefetch="hover">News</a>
-          <a href={repositoryUrl} rel="noreferrer">GitHub</a>
-          <a href="/about" data-astro-prefetch="hover">About</a>
+          <a href="/news" aria-label="News" data-astro-prefetch="hover">
+            <Newspaper aria-hidden="true" size={15} strokeWidth={1.8} />
+            <span>News</span>
+          </a>
+          <a href={repositoryUrl} aria-label="GitHub" rel="noreferrer">
+            <Github aria-hidden="true" size={15} strokeWidth={1.8} />
+            <span>GitHub</span>
+          </a>
+          <a href="/about" aria-label="About" data-astro-prefetch="hover">
+            <Info aria-hidden="true" size={15} strokeWidth={1.8} />
+            <span>About</span>
+          </a>
         </nav>
         <button
           class="theme-toggle"

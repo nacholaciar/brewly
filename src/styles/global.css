@@ -207,6 +207,21 @@ a {
   font-size: 15px;
 }
 
+.site-header nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.site-header nav svg {
+  flex: 0 0 auto;
+  opacity: 0.78;
+}
+
+.site-header nav a:hover svg {
+  opacity: 1;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -1266,6 +1281,18 @@ kbd {
   padding: clamp(54px, 8vw, 92px) 0 80px;
 }
 
+.about-brand {
+  margin: -26px 0 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.about-brand img {
+  width: clamp(128px, 18vw, 180px);
+  height: auto;
+  filter: drop-shadow(0 10px 24px rgb(0 0 0 / 22%));
+}
+
 .content-page h1,
 .package-page h1 {
   margin: 6px 0 12px;
@@ -1428,6 +1455,14 @@ kbd {
 
   .site-header nav {
     gap: 20px;
+  }
+
+  .site-header nav a {
+    gap: 0;
+  }
+
+  .site-header nav a span {
+    display: none;
   }
 
   .hero {
