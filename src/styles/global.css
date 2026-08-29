@@ -280,7 +280,7 @@ a {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(600px, 900px);
+  grid-template-columns: minmax(360px, 1fr) minmax(540px, 900px);
   grid-template-rows: 76px minmax(0, 1fr);
   overflow: hidden;
   background: var(--surface);
@@ -290,6 +290,8 @@ a {
   min-width: 0;
   overflow: auto;
   border-right: 1px solid var(--border);
+  container-name: search-results;
+  container-type: inline-size;
 }
 
 .results-header {
@@ -396,12 +398,14 @@ kbd {
   box-shadow: inset 2px 0 0 var(--accent);
 }
 
-.result-row.is-pinned:not(.is-active) {
-  background: linear-gradient(90deg, var(--accent-wash), transparent 58%);
-  box-shadow: inset 2px 0 0 var(--accent-soft);
+.result-row.is-selected {
+  background: var(--surface-selected);
+  border-color: var(--accent-faint);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.result-row.is-pinned .result-icon {
+.result-row.is-selected .result-icon,
+.result-row.is-selected .result-copy strong {
   color: var(--accent);
 }
 
@@ -1302,7 +1306,7 @@ kbd {
   grid-template-columns: 120px 1fr;
 }
 
-@media (min-width: 901px) and (max-width: 1180px) {
+@container search-results (max-width: 400px) {
   .result-row {
     grid-template-columns: 38px minmax(0, 1fr);
   }

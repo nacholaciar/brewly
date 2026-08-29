@@ -555,7 +555,14 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
   }, [initialPackage]);
 
   function openPackage(item: BrewPackage) {
-    void navigate(packagePath(item));
+    if (window.matchMedia("(max-width: 600px)").matches) {
+      void navigate(packagePath(item));
+      return;
+    }
+
+    window.history.pushState({ brewlyPackage: true }, "", packagePath(item));
+    setOpenedPackage(item);
+    setCopied(false);
   }
 
   function returnToResults() {
@@ -654,8 +661,8 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
                     type="button"
                     id={`result-${item.type}-${item.slug}`}
                     role="option"
-                    aria-selected={isActive}
-                    className={`result-row ${isActive ? "is-active" : ""} ${isPinned ? "is-pinned" : ""}`}
+                    aria-selected={isPinned}
+                    className={`result-row ${isActive ? "is-active" : ""} ${isPinned ? "is-selected" : ""}`}
                     key={`${item.type}-${item.slug}`}
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={() => openPackage(item)}
