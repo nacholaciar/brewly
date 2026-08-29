@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import { serializeJsonLd } from "../lib/json-ld";
 import "../styles/global.css";
 
 type Props = {
@@ -59,7 +60,7 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
     <meta property="og:image:alt" content="Brewly logo: a copper bottle crate" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={brandImage} />
-    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {jsonLd && <script is:inline type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />}
     <ClientRouter fallback="swap" />
   </head>
   <body class={appShell ? "app-shell" : undefined} transition:animate="none">
