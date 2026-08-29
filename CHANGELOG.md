@@ -3,6 +3,14 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.6.2](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.1...brewly-v0.6.2) (2026-08-29)
+
+
+### Bug Fixes
+
+* escape embedded JSON-LD ([7fe147d](https://github.com/nacholaciar/brewly/commit/7fe147d432fb2e2291f55da50eb1025e7d53484a))
+* pin privileged GitHub Actions ([bbaf483](https://github.com/nacholaciar/brewly/commit/bbaf48325cd5f504f6a580248c8c05fb24d50783))
+
 ## [0.6.1](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.0...brewly-v0.6.1) (2026-08-28)
 
 
