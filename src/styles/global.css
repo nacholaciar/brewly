@@ -321,11 +321,6 @@ a {
   align-items: center;
   gap: 17px;
   color: var(--accent);
-  border-bottom: 1px solid var(--border);
-}
-
-.search-box:focus-within {
-  border-bottom-color: var(--accent-soft);
 }
 
 .search-box input {
