@@ -280,7 +280,7 @@ a {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(440px, 1.25fr) minmax(360px, 0.75fr);
+  grid-template-columns: minmax(280px, 1fr) minmax(600px, 900px);
   grid-template-rows: 76px minmax(0, 1fr);
   overflow: hidden;
   background: var(--surface);
@@ -1300,6 +1300,17 @@ kbd {
 .package-page .metadata > div {
   display: grid;
   grid-template-columns: 120px 1fr;
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .result-row {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .result-row > .type-label,
+  .result-row > code {
+    display: none;
+  }
 }
 
 @media (max-width: 900px) {
