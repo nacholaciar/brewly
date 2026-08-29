@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.6.3](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.2...brewly-v0.6.3) (2026-08-29)
+
+
+### Performance Improvements
+
+* remove unused motion runtime ([492a2c2](https://github.com/nacholaciar/brewly/commit/492a2c2d3a43ba81af620845600e5ed157156580))
+
 ## [0.6.2](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.1...brewly-v0.6.2) (2026-08-29)
 
 
