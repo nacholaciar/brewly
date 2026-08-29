@@ -29,7 +29,7 @@ jobs:
           bun-version: 1.4.0
       - run: bun install --frozen-lockfile
       - name: Restore the last deployed news fingerprint
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .sync-state/news.sha256
           key: news-feed-${{ github.run_id }}
@@ -74,7 +74,7 @@ jobs:
           command: deploy
       - name: Save the deployed news fingerprint
         if: github.event_name != 'schedule' || steps.news.outputs.changed == 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .sync-state/news.sha256
           key: news-feed-${{ github.run_id }}
