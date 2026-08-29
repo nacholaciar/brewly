@@ -22,6 +22,7 @@
   --formula: #f0a44b;
   --cask: #76a9e9;
   --surface-overlay: rgb(16 18 20 / 94%);
+  --surface-search: rgb(16 18 20 / 52%);
   --surface-deep: #0e1012;
   --surface-code: #0d0f10;
   --surface-hover: #1b1d1f;
@@ -51,6 +52,7 @@
   --formula: #a95708;
   --cask: #286da8;
   --surface-overlay: rgb(255 255 255 / 94%);
+  --surface-search: rgb(255 255 255 / 52%);
   --surface-deep: #faf9f7;
   --surface-code: #f5f3ef;
   --surface-hover: #ebe8e2;
@@ -77,6 +79,7 @@
   --formula: #e2a843;
   --cask: #87c7d8;
   --surface-overlay: rgb(46 42 36 / 94%);
+  --surface-search: rgb(46 42 36 / 48%);
   --surface-deep: rgb(0 0 0 / 20%);
   --surface-code: rgb(0 0 0 / 30%);
   --surface-hover: #745626;
@@ -321,6 +324,9 @@ a {
   align-items: center;
   gap: 17px;
   color: var(--accent);
+  background: var(--surface-search);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
 }
 
 .search-box input {
@@ -503,6 +509,34 @@ kbd {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
+}
+
+@media (min-width: 901px) {
+  .has-package-detail .search-box {
+    grid-row: 1;
+    position: relative;
+    z-index: 3;
+  }
+
+  .has-package-detail .search-box::after {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 28px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(to bottom, var(--surface-search), transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(135%);
+    backdrop-filter: blur(18px) saturate(135%);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+    mask-image: linear-gradient(to bottom, #000, transparent);
+  }
+
+  .has-package-detail .package-detail-view {
+    grid-row: 1 / -1;
+    padding-top: 95px;
+  }
 }
 
 .package-detail-view > .package-detail-toolbar,
