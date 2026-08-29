@@ -34,11 +34,11 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
       (() => {
         try {
           const savedTheme = localStorage.getItem("brewly-theme");
-          const theme = savedTheme === "light" || savedTheme === "dark"
+          const theme = savedTheme === "light" || savedTheme === "dark" || savedTheme === "homebrew"
             ? savedTheme
             : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
           document.documentElement.dataset.theme = theme;
-          document.documentElement.style.colorScheme = theme;
+          document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
         } catch {}
       })();
     </script>
@@ -76,13 +76,24 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
           <a href={repositoryUrl} rel="noreferrer">GitHub</a>
           <a href="/about" data-astro-prefetch="hover">About</a>
         </nav>
-        <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Current theme: Dark. Switch to Homebrew theme"
+          title="Dark theme — switch to Homebrew"
+        >
           <svg class="sun-icon" aria-hidden="true" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="4"></circle>
             <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"></path>
           </svg>
           <svg class="moon-icon" aria-hidden="true" viewBox="0 0 24 24">
             <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"></path>
+          </svg>
+          <svg class="beer-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M17 11h1a3 3 0 0 1 0 6h-1"></path>
+            <path d="M9 12v6M13 12v6"></path>
+            <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"></path>
+            <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"></path>
           </svg>
         </button>
       </div>
@@ -102,11 +113,18 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         if (!(button instanceof HTMLButtonElement)) return;
 
         const update = () => {
-          const theme = document.documentElement.dataset.theme ?? "dark";
-          const nextTheme = theme === "dark" ? "light" : "dark";
-          button.setAttribute("aria-label", `Switch to ${nextTheme} theme`);
+          const themes = ["dark", "homebrew", "light"];
+          const labels: Record<string, string> = { dark: "Dark", homebrew: "Homebrew", light: "Light" };
+          const currentTheme = document.documentElement.dataset.theme ?? "dark";
+          const theme = themes.includes(currentTheme) ? currentTheme : "dark";
+          const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length];
+          button.setAttribute(
+            "aria-label",
+            `Current theme: ${labels[theme]}. Switch to ${labels[nextTheme]} theme`,
+          );
+          button.title = `${labels[theme]} theme — switch to ${labels[nextTheme]}`;
           if (themeColor instanceof HTMLMetaElement) {
-            themeColor.content = theme === "dark" ? "#0b0c0d" : "#f6f5f2";
+            themeColor.content = theme === "dark" ? "#0b0c0d" : theme === "homebrew" ? "#2e2a24" : "#f6f5f2";
           }
         };
 
@@ -114,9 +132,12 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         if (button.dataset.themeReady) return;
         button.dataset.themeReady = "true";
         button.addEventListener("click", () => {
-          const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          const themes = ["dark", "homebrew", "light"];
+          const currentTheme = document.documentElement.dataset.theme ?? "dark";
+          const currentIndex = themes.includes(currentTheme) ? themes.indexOf(currentTheme) : 0;
+          const theme = themes[(currentIndex + 1) % themes.length];
           document.documentElement.dataset.theme = theme;
-          document.documentElement.style.colorScheme = theme;
+          document.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
           localStorage.setItem("brewly-theme", theme);
           update();
         });
@@ -125,7 +146,7 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
       document.addEventListener("astro:before-swap", (event) => {
         const theme = localStorage.getItem("brewly-theme") ?? document.documentElement.dataset.theme ?? "dark";
         event.newDocument.documentElement.dataset.theme = theme;
-        event.newDocument.documentElement.style.colorScheme = theme;
+        event.newDocument.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
       });
       document.addEventListener("astro:page-load", setupThemeButton);
       setupThemeButton();

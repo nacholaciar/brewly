@@ -61,6 +61,32 @@
   --shadow-command: 0 24px 60px rgb(49 42 33 / 12%);
 }
 
+:root[data-theme="homebrew"] {
+  color-scheme: dark;
+  --background: #2e2a24;
+  --surface: rgb(0 0 0 / 10%);
+  --surface-raised: rgb(0 0 0 / 20%);
+  --surface-selected: rgb(162 107 20 / 30%);
+  --text: #ffd79a;
+  --text-secondary: #bb8844;
+  --text-muted: #999988;
+  --border: #745626;
+  --border-subtle: rgb(162 107 20 / 30%);
+  --accent: #e2a843;
+  --accent-soft: #f7c96c;
+  --formula: #e2a843;
+  --cask: #87c7d8;
+  --surface-overlay: rgb(46 42 36 / 94%);
+  --surface-deep: rgb(0 0 0 / 20%);
+  --surface-code: rgb(0 0 0 / 30%);
+  --surface-hover: #745626;
+  --surface-tag: rgb(0 0 0 / 20%);
+  --accent-wash: rgb(162 107 20 / 30%);
+  --accent-faint: rgb(226 168 67 / 45%);
+  --body-glow: rgb(255 215 154 / 4%);
+  --shadow-command: 0 28px 70px rgb(0 0 0 / 40%);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -216,13 +242,20 @@ a {
   stroke-linejoin: round;
 }
 
+.theme-toggle .sun-icon,
 .theme-toggle .moon-icon,
-:root[data-theme="light"] .theme-toggle .sun-icon {
+.theme-toggle .beer-icon {
   display: none;
 }
 
-:root[data-theme="light"] .theme-toggle .moon-icon {
+:root[data-theme="dark"] .theme-toggle .moon-icon,
+:root[data-theme="light"] .theme-toggle .sun-icon,
+:root[data-theme="homebrew"] .theme-toggle .beer-icon {
   display: block;
+}
+
+:root[data-theme="homebrew"] .theme-toggle {
+  color: var(--accent);
 }
 
 .site-header nav a,
