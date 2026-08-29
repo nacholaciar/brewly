@@ -3,6 +3,13 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.7.1](https://github.com/nacholaciar/brewly/compare/brewly-v0.7.0...brewly-v0.7.1) (2026-08-29)
+
+
+### Performance Improvements
+
+* improve accessibility and critical loading ([27498b2](https://github.com/nacholaciar/brewly/commit/27498b2111c0e1a31053aeb5f58518f850cde0db))
+
 ## [0.7.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.3...brewly-v0.7.0) (2026-08-29)
 
 
