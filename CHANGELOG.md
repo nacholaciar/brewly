@@ -3,6 +3,19 @@
 All notable changes to Brewly are documented in this file. Future entries are
 generated automatically from Conventional Commits by Release Please.
 
+## [0.7.0](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.3...brewly-v0.7.0) (2026-08-29)
+
+
+### Features
+
+* add Homebrew color theme ([5b721cc](https://github.com/nacholaciar/brewly/commit/5b721cc3ed77f232aab8246d886cc71e8c838d98))
+* enrich Homebrew package metadata ([a666850](https://github.com/nacholaciar/brewly/commit/a6668508dd39a765b680dab2058fb3f54086e438))
+
+
+### Bug Fixes
+
+* preserve package selection and panel sizing ([eef9d31](https://github.com/nacholaciar/brewly/commit/eef9d310d1b113676b69ca8b5a0e14cf4dc5b276))
+
 ## [0.6.3](https://github.com/nacholaciar/brewly/compare/brewly-v0.6.2...brewly-v0.6.3) (2026-08-29)
 
 
