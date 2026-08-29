@@ -5,8 +5,6 @@ import Copy from "lucide-react/dist/esm/icons/copy";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import PackageIcon from "lucide-react/dist/esm/icons/package";
 import Search from "lucide-react/dist/esm/icons/search";
-import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
-import * as m from "motion/react-m";
 import { startTransition, useEffect, useRef, useState } from "react";
 import { type BrewPackage, installCommand, packagePath } from "../lib/packages";
 
@@ -422,106 +420,100 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
   }
 
   return (
-    <LazyMotion features={domAnimation} strict>
-      <MotionConfig reducedMotion="user">
-        <m.section
-          className={`command-surface ${isStandalonePackage ? "has-package-detail" : ""}`}
-          aria-label="Package search"
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <label className="search-box" htmlFor="package-search">
-            <Search aria-hidden="true" size={24} strokeWidth={1.8} />
-            <span className="sr-only">Search formulae and casks</span>
-            <input
-              ref={inputRef}
-              id="package-search"
-              type="search"
-              autoComplete="off"
-              autoFocus
-              value={query}
-              onChange={(event) => updateQuery(event.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder="Search formulae and casks…"
-              aria-controls="search-results"
-              aria-activedescendant={
-                !isStandalonePackage && selected ? `result-${selected.type}-${selected.slug}` : undefined
-              }
-            />
-            <kbd>⌘ K</kbd>
-          </label>
+    <section
+      className={`command-surface ${isStandalonePackage ? "has-package-detail" : ""}`}
+      aria-label="Package search"
+    >
+      <label className="search-box" htmlFor="package-search">
+        <Search aria-hidden="true" size={24} strokeWidth={1.8} />
+        <span className="sr-only">Search formulae and casks</span>
+        <input
+          ref={inputRef}
+          id="package-search"
+          type="search"
+          autoComplete="off"
+          autoFocus
+          value={query}
+          onChange={(event) => updateQuery(event.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Search formulae and casks…"
+          aria-controls="search-results"
+          aria-activedescendant={
+            !isStandalonePackage && selected ? `result-${selected.type}-${selected.slug}` : undefined
+          }
+        />
+        <kbd>⌘ K</kbd>
+      </label>
 
-          {isStandalonePackage && openedPackage ? (
-            <PackageDetailView
-              copied={copied}
-              headingLevel={initialPackage ? "h1" : "h2"}
-              item={openedPackage}
-              onBack={returnToResults}
-              onCopy={copyInstallCommand}
-            />
-          ) : (
-            <>
-              <div ref={searchColumnRef} className="search-column">
-                <div className="results-header">
-                  <span>Search results</span>
-                  <span>
-                    {results.length} {results.length === 1 ? "package" : "packages"}
-                  </span>
+      {isStandalonePackage && openedPackage ? (
+        <PackageDetailView
+          copied={copied}
+          headingLevel={initialPackage ? "h1" : "h2"}
+          item={openedPackage}
+          onBack={returnToResults}
+          onCopy={copyInstallCommand}
+        />
+      ) : (
+        <>
+          <div ref={searchColumnRef} className="search-column">
+            <div className="results-header">
+              <span>Search results</span>
+              <span>
+                {results.length} {results.length === 1 ? "package" : "packages"}
+              </span>
+            </div>
+            <div id="search-results" className="results" role="listbox" aria-label="Search results">
+              {results.map((item, index) => {
+                const isActive = index === activeIndex;
+                const isPinned = openedPackage?.type === item.type && openedPackage.slug === item.slug;
+                return (
+                  <button
+                    type="button"
+                    id={`result-${item.type}-${item.slug}`}
+                    role="option"
+                    aria-selected={isActive}
+                    className={`result-row ${isActive ? "is-active" : ""} ${isPinned ? "is-pinned" : ""}`}
+                    key={`${item.type}-${item.slug}`}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => openPackage(item)}
+                  >
+                    <span className="result-icon" aria-hidden="true">
+                      <PackageIcon size={22} strokeWidth={1.7} />
+                    </span>
+                    <span className="result-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.description}</span>
+                    </span>
+                    <span className={`type-label type-${item.type}`}>
+                      {item.type === "formula" ? "Formula" : "Cask"}
+                    </span>
+                    <code>{item.version}</code>
+                  </button>
+                );
+              })}
+              {results.length === 0 && (
+                <div className="empty-state" role="status">
+                  <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
+                  {!isSearching && <span>Try a name, command, or description.</span>}
                 </div>
-                <div id="search-results" className="results" role="listbox" aria-label="Search results">
-                  {results.map((item, index) => {
-                    const isActive = index === activeIndex;
-                    const isPinned = openedPackage?.type === item.type && openedPackage.slug === item.slug;
-                    return (
-                      <button
-                        type="button"
-                        id={`result-${item.type}-${item.slug}`}
-                        role="option"
-                        aria-selected={isActive}
-                        className={`result-row ${isActive ? "is-active" : ""} ${isPinned ? "is-pinned" : ""}`}
-                        key={`${item.type}-${item.slug}`}
-                        onMouseEnter={() => setActiveIndex(index)}
-                        onClick={() => openPackage(item)}
-                      >
-                        <span className="result-icon" aria-hidden="true">
-                          <PackageIcon size={22} strokeWidth={1.7} />
-                        </span>
-                        <span className="result-copy">
-                          <strong>{item.name}</strong>
-                          <span>{item.description}</span>
-                        </span>
-                        <span className={`type-label type-${item.type}`}>
-                          {item.type === "formula" ? "Formula" : "Cask"}
-                        </span>
-                        <code>{item.version}</code>
-                      </button>
-                    );
-                  })}
-                  {results.length === 0 && (
-                    <div className="empty-state" role="status">
-                      <strong>{isSearching ? "Searching…" : "No packages found"}</strong>
-                      {!isSearching && <span>Try a name, command, or description.</span>}
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
+            </div>
+          </div>
 
-              <aside className="detail-panel" aria-label="Package details" aria-live="polite">
-                {detailItem ? (
-                  <PackagePreview
-                    copied={copied}
-                    item={detailItem}
-                    pinned={Boolean(openedPackage)}
-                    onCopy={copyInstallCommand}
-                  />
-                ) : (
-                  <div className="detail-placeholder">Start typing to inspect a package.</div>
-                )}
-              </aside>
-            </>
-          )}
-        </m.section>
-      </MotionConfig>
-    </LazyMotion>
+          <aside className="detail-panel" aria-label="Package details" aria-live="polite">
+            {detailItem ? (
+              <PackagePreview
+                copied={copied}
+                item={detailItem}
+                pinned={Boolean(openedPackage)}
+                onCopy={copyInstallCommand}
+              />
+            ) : (
+              <div className="detail-placeholder">Start typing to inspect a package.</div>
+            )}
+          </aside>
+        </>
+      )}
+    </section>
   );
 }
