@@ -1,4 +1,3 @@
-import { navigate } from "astro:transitions/client";
 import ArrowLeft from "lucide-react/dist/esm/icons/arrow-left";
 import Check from "lucide-react/dist/esm/icons/check";
 import Copy from "lucide-react/dist/esm/icons/copy";
@@ -443,7 +442,7 @@ function PackagePreview({ copied, item, pinned, onCopy }: PackagePreviewProps) {
           </dl>
         </section>
       )}
-      <a className="open-package" href={packagePath(item)} data-astro-prefetch="hover">
+      <a className="open-package" href={packagePath(item)}>
         Open full page <ExternalLink size={15} aria-hidden="true" />
       </a>
     </div>
@@ -556,7 +555,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
 
   function openPackage(item: BrewPackage) {
     if (window.matchMedia("(max-width: 600px)").matches) {
-      void navigate(packagePath(item));
+      window.location.assign(packagePath(item));
       return;
     }
 

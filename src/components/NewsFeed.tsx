@@ -116,7 +116,7 @@ export default function NewsFeed({ items, today }: Props) {
                     </span>
                     <div>
                       <h3>
-                        <a className="news-card-main-link" href={packagePath(item)} data-astro-prefetch="hover">
+                        <a className="news-card-main-link" href={packagePath(item)}>
                           {item.name}
                         </a>
                       </h3>

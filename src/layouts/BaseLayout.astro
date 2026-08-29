@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import Github from "lucide-react/dist/esm/icons/github";
 import Info from "lucide-react/dist/esm/icons/info";
 import Newspaper from "lucide-react/dist/esm/icons/newspaper";
@@ -64,18 +63,17 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={brandImage} />
     {jsonLd && <script is:inline type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />}
-    <ClientRouter fallback="swap" />
   </head>
   <body class={appShell ? "app-shell" : undefined} transition:animate="none">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-      <a class="wordmark" href="/" aria-label="Brewly home" data-astro-prefetch="hover">
-        <img src="/assets/brewly-logo.webp" width="600" height="678" alt="" />
+      <a class="wordmark" href="/" aria-label="Brewly home">
+        <img src="/assets/brewly-logo-64.webp" width="64" height="72" alt="" />
         <span>Brewly</span>
       </a>
       <div class="header-actions">
         <nav aria-label="Primary navigation">
-          <a href="/news" aria-label="News" data-astro-prefetch="hover">
+          <a href="/news" aria-label="News">
             <Newspaper aria-hidden="true" size={15} strokeWidth={1.8} />
             <span>News</span>
           </a>
@@ -83,7 +81,7 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
             <Github aria-hidden="true" size={15} strokeWidth={1.8} />
             <span>GitHub</span>
           </a>
-          <a href="/about" aria-label="About" data-astro-prefetch="hover">
+          <a href="/about" aria-label="About">
             <Info aria-hidden="true" size={15} strokeWidth={1.8} />
             <span>About</span>
           </a>
@@ -155,12 +153,6 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         });
       }
 
-      document.addEventListener("astro:before-swap", (event) => {
-        const theme = localStorage.getItem("brewly-theme") ?? document.documentElement.dataset.theme ?? "dark";
-        event.newDocument.documentElement.dataset.theme = theme;
-        event.newDocument.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
-      });
-      document.addEventListener("astro:page-load", setupThemeButton);
       setupThemeButton();
     </script>
   </body>
