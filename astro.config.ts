@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     inlineStylesheets: "always",
   },
+  prefetch: false,
   vite: {
     plugins: [tailwindcss()],
   },

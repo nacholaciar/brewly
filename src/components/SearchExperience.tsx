@@ -1,3 +1,4 @@
+import { navigate } from "astro:transitions/client";
 import ArrowLeft from "lucide-react/dist/esm/icons/arrow-left";
 import Check from "lucide-react/dist/esm/icons/check";
 import Copy from "lucide-react/dist/esm/icons/copy";
@@ -555,7 +556,7 @@ export default function SearchExperience({ initialPackages, initialPackage }: Pr
 
   function openPackage(item: BrewPackage) {
     if (window.matchMedia("(max-width: 600px)").matches) {
-      window.location.assign(packagePath(item));
+      void navigate(packagePath(item));
       return;
     }
 

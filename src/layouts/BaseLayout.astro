@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import Github from "lucide-react/dist/esm/icons/github";
 import Info from "lucide-react/dist/esm/icons/info";
 import Newspaper from "lucide-react/dist/esm/icons/newspaper";
@@ -63,10 +64,11 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:image" content={brandImage} />
     {jsonLd && <script is:inline type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />}
+    <ClientRouter fallback="swap" />
   </head>
   <body class={appShell ? "app-shell" : undefined} transition:animate="none">
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header">
+    <header class="site-header" transition:persist="site-header">
       <a class="wordmark" href="/" aria-label="Brewly home">
         <img src="/assets/brewly-logo-64.webp" width="64" height="72" alt="" />
         <span>Brewly</span>
@@ -153,6 +155,12 @@ const repositoryUrl = import.meta.env.PUBLIC_REPOSITORY_URL ?? "https://github.c
         });
       }
 
+      document.addEventListener("astro:before-swap", (event) => {
+        const theme = localStorage.getItem("brewly-theme") ?? document.documentElement.dataset.theme ?? "dark";
+        event.newDocument.documentElement.dataset.theme = theme;
+        event.newDocument.documentElement.style.colorScheme = theme === "light" ? "light" : "dark";
+      });
+      document.addEventListener("astro:page-load", setupThemeButton);
       setupThemeButton();
     </script>
   </body>
